@@ -256,7 +256,7 @@ function OrderedRing () {
   var defaultCmp = function (a,b) {
     if (this.equals(a,b))
       return 0;
-    else if (this.isNonNeg(this.minus(a, b)) /* a - b >= 0 */
+    else if (this.isNonNeg(this.minus(a, b))) /* a - b >= 0 */
       return 1;
     else
       return -1;
