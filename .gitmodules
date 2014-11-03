@@ -1,0 +1,9 @@
+[submodule "java"]
+	path = java
+	url = https://github.com/mdgeorge4153/jalgebra.git
+[submodule "cpp"]
+	path = cpp
+	url = https://github.com/mdgeorge4153/Tangy.git
+[submodule "ocaml"]
+	path = ocaml
+	url = https://github.com/cs3110/tangrams.git
