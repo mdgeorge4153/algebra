@@ -12,50 +12,50 @@
     function toDomTable(results) {
       var header = TR(TH("test"), TH("result"));
       var rows   = [header];
-    
+
       for (var i in results) {
         var result = results[i];
         var output = [];
-    
+
         /* check for exceptions */
         var excs = [];
         for (var exc in result.exc)
           excs.push(LI(B("(",result.exc[exc].length,
-    		     "/",result.num, ")"),
-    		   exc));
-    
+                         "/",result.num, ")"),
+                       exc));
+
         if (excs.length > 0)
           output.push(P({"class": "excs"},
-    		    "some exceptions were thrown:",
-    		    UL.apply(null, excs)));
-    
+                        "some exceptions were thrown:",
+                        UL.apply(null, excs)));
+
         /* list failed test cases */
         var fails = [];
         for (var j in result.fail)
           fails.push(LI("test: " + result.fail[j]));
-    
+
         if (fails.length > 3)
           fails = [
-    	fails[0],
-    	fails[1],
-    	fails[2],
-    	LI("... and ",fails.length - 3," others")
+            fails[0],
+            fails[1],
+            fails[2],
+            LI("... and ",fails.length - 3," others")
           ];
-    
+
         if (fails.length > 0)
           output.push(P({"class": "fails"},
-    		    "some tests failed:",
-    		    UL.apply(null, fails)));
-    
+                        "some tests failed:",
+                        UL.apply(null, fails)));
+
         /* all tests pass! */
         if (output.length === 0)
           output.push(P({"class": "success"},
-    		    "all ", result.num, " tests pass"));
-    
+                        "all ", result.num, " tests pass"));
+
         /* add output */
         rows.push(TR(TD(i), TD.apply(null, output)));
       }
-    
+
       return TABLE.apply(null, rows);
     }
 
