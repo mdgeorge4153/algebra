@@ -1,3 +1,4 @@
+
 /* interfaces *****************************************************************/
 
 function Set() {
@@ -176,6 +177,10 @@ function Field () {
   }
 }
 
+var GT = 1;
+var EQ = 0;
+var LT = -1;
+
 function OrderedRing () {
   Ring.call(this);
 
@@ -257,11 +262,11 @@ function OrderedRing () {
   /** returns the number +1, 0, or -1 to indicate the sign of a */
   var defaultSign = function(a) {
     if (this.equals(a, this.zero))
-      return 0;
+      return EQ;
     else if (this.isNonNeg(a))
-      return 1;
+      return GT;
     else
-      return -1;
+      return LT;
   }
 
   this.sign = defaultSign;
