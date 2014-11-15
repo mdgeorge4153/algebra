@@ -34,12 +34,19 @@
         for (var j in result.fail)
           fails.push(LI("test: " + result.fail[j]));
 
-        if (fails.length > 3)
+        if (fails.length > 10)
           fails = [
-            fails[0],
-            fails[1],
-            fails[2],
-            LI("... and ",fails.length - 3," others")
+	    fails[0],
+	    fails[1],
+	    fails[2],
+	    fails[3],
+	    fails[4],
+	    fails[5],
+            fails[6],
+            fails[7],
+            fails[8],
+	    fails[9],
+            LI("... and ",fails.length - 10," others")
           ];
 
         if (fails.length > 0)
@@ -101,6 +108,26 @@ function mkFrac (test) {
   return rats.fromInts(test[0],test[1]);
 }
 test(rats, tests.map(mkFrac));
+</script>
+
+<h1>Root2 tests</h1>
+<script>
+var tests = [
+];
+function mkVal (test) {
+};
+test(root2, tests.map(mkVal));
+</script>
+
+<h1>Root23 tests</h1>
+<script>
+var tests = [
+  root23.one, root23.zero, root23.neg(root23.one),
+  root23.sqrt2, root23.sqrt3, root23.sqrt6,
+  root23.plus(root23.sqrt2, root23.sqrt6), root23.minus(root23.sqrt3, root23.one),
+  root23.fromInt(23),
+];
+test(root23, tests);
 </script>
 
 </body>

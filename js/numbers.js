@@ -19,7 +19,12 @@ function Set() {
 
   this.checkTrue = function () {
     return true;
-  }
+  };
+
+  this.checkN = function (n) {
+    return n == 1;
+  };
+  this.checkN.tests = [[1]];
 
   /* helper functions */
 
@@ -29,20 +34,20 @@ function Set() {
 
   this.ne = neDefault;
   this.checkNe = function (a,b) {
-    return this.ne(a,b) == neDefault.apply(this, [a,b]);
+    return this.ne(a,b) == neDefault.call(this, a, b);
   };
 }
 
 function Group() {
-  Set.apply(this, []);
+  Set.call(this);
 
-  this.zero  = function ()    { throw("unimplemented function zero"); };
+  this.zero  = undefined;
   this.plus  = function (a,b) { throw("unimplemented function plus"); };
   this.neg   = function (a)   { throw("unimplemented function neg"); };
 
   /* axiom unit tests */
   this.checkZeroClosed = function () {
-    return this.isElement(this.zero());
+    return this.isElement(this.zero);
   }
 
   this.checkPlusClosed = function (a,b) {
@@ -54,7 +59,7 @@ function Group() {
   }
 
   this.checkPlusIdent = function (a) {
-    return this.equals(this.plus(this.zero(), a),
+    return this.equals(this.plus(this.zero, a),
                        a);
   };
 
@@ -65,7 +70,7 @@ function Group() {
 
   this.checkPlusInverse = function (a) {
     return this.equals(this.plus(a, this.neg(a)),
-                       this.zero());
+                       this.zero);
   };
 
   this.checkPlusCommutative = function (a,b) {
@@ -79,26 +84,26 @@ function Group() {
   this.minus      = minusDefault;
   this.checkMinus = function (a,b) {
     return this.equals(this.minus(a,b),
-                       minusDefault.apply(this, [a,b]));
+                       minusDefault.call(this,a,b));
   }
 
-  var isZeroDefault = function (a) { return this.equals(a, this.zero()); };
+  var isZeroDefault = function (a) { return this.equals(a, this.zero); };
 
   this.isZero = isZeroDefault;
   this.checkIsZero = function (a) {
-    return this.isZero(a) == isZeroDefault.apply(this, [a]);
+    return this.isZero(a) == isZeroDefault.call(this, a);
   }
 }
 
 function Ring() {
-  Group.apply(this, []);
+  Group.call(this);
 
-  this.one   = function ()    { throw("unimplemented function one"); };
+  this.one   = undefined;
   this.times = function (a,b) { throw("unimplemented function times"); };
 
   /* axiom unit tests */
   this.checkOneClosed = function () {
-    return this.isElement(this.one());
+    return this.isElement(this.one);
   };
 
   this.checkTimesClosed = function (a,b) {
@@ -111,7 +116,7 @@ function Ring() {
   };
 
   this.checkMultIdent = function (a) {
-    return this.equals(this.times(a, this.one()), a);
+    return this.equals(this.times(a, this.one), a);
   };
 
   this.checkMultCommutative = function (a,b) {
@@ -124,44 +129,27 @@ function Ring() {
   };
 
   /* helper functions */
-  var twoDefault = function () {
-    return this.plus(this.one(), this.one());
-  };
-
-  this.two = twoDefault;
-  this.checkTwo = function () {
-    return this.equals(this.two(), twoDefault.apply(this, []));
-  };
-
   var fromIntDefault = function (n) {
     if (n < 0)
       return this.neg(this.fromInt(-n));
     else if (n == 0)
-      return this.zero();
+      return this.zero;
     else {
-      bit  = n % 2 == 0 ? this.zero() : this.one();
-      rest = n / 2;
+      var bit  = n % 2 == 0 ? this.zero : this.one;
+      var rest = fromIntDefault.call(this, Math.floor(n / 2));
       return this.plus(this.plus(rest, rest), bit);
     }
   };
 
   this.fromInt = fromIntDefault;
-  this.checkFromInt = function () {
-    /* this is a bit grody.  It would be more in keeping with the rest of the
-     * library to make this function take a single argument.  However, this
-     * argument is different because it should be an integer, not an element of
-     * the ring.  Instead, we just iterate over a handful of integers.
-     */
-    tests = [-10000, -37, -1, 0, 1, 42, 99, 1000];
-    for (var i in tests)
-      if (!this.equals(this.fromInt(tests[i]), fromIntDefault.apply(this,[tests[i]])))
-        return false;
-    return true;
+  this.checkFromInt = function (n) {
+    return this.equals(this.fromInt(n), fromIntDefault.call(this,n));
   }
+  this.checkFromInt.tests = [[-10000], [-37], [-1], [0], [1], [42], [99], [1000]];
 }
 
 function Field () {
-  Ring.apply(this, []);
+  Ring.call(this);
 
   this.inv = function (a) { throw("unimplemented function inv"); };
 
@@ -171,7 +159,8 @@ function Field () {
   }
 
   this.checkInverse = function (a) {
-    return this.isZero(a) ? true : this.equals(this.times(a, this.inv(a)), this.one());
+    return this.isZero(a) ? true
+                          : this.equals(this.times(a, this.inv(a)), this.one);
   };
 
   /* helper functions */
@@ -183,18 +172,19 @@ function Field () {
   this.checkDiv = function (a,b) {
     return this.isZero(b)
       ? true
-      : this.equals(this.div(a,b), divDefault.apply(this, [a,b]));
+      : this.equals(this.div(a,b), divDefault.call(this,a,b));
   }
 }
 
 function OrderedRing () {
-  Ring.apply(this, []);
+  Ring.call(this);
 
   this.isNonNeg = function (a) { throw("unimplemented function isNonNeg"); };
+  this.toNumber = function (a) { throw("unimplemented function toNumber"); };
 
   /* axiom unit tests */
   this.checkMinusOneNeg = function () {
-    return !this.isNonNeg(this.neg(this.one()));
+    return !this.isNonNeg(this.neg(this.one));
   };
 
   this.checkSquaresNonNeg = function (a) {
@@ -219,7 +209,7 @@ function OrderedRing () {
 
   this.le = defaultLe;
   this.checkLe = function (a,b) {
-    return this.le(a,b) == defaultLe.apply(this, [a,b]);
+    return this.le(a,b) == defaultLe.call(this, a, b);
   };
 
   var defaultGe = function (a,b) {
@@ -228,7 +218,7 @@ function OrderedRing () {
 
   this.ge = defaultGe;
   this.checkGe = function (a,b) {
-    return this.ge(a,b) == defaultGe.apply(this, [a,b]);
+    return this.ge(a,b) == defaultGe.call(this, a, b);
   }
 
   var defaultLt = function (a,b) {
@@ -237,7 +227,7 @@ function OrderedRing () {
 
   this.lt = defaultLt;
   this.checkLt = function (a,b) {
-    return this.lt(a,b) == defaultLt.apply(this, [a,b]);
+    return this.lt(a,b) == defaultLt.call(this, a, b);
   }
 
   var defaultGt = function (a,b) {
@@ -246,7 +236,7 @@ function OrderedRing () {
 
   this.gt = defaultGt;
   this.checkGt = function (a,b) {
-    return this.gt(a,b) == defaultGt.apply(this, [a,b]);
+    return this.gt(a,b) == defaultGt.call(this, a, b);
   }
 
   /* if a < b, returns a number < 0
@@ -254,12 +244,7 @@ function OrderedRing () {
    * if a > b, returns a number > 0
    */
   var defaultCmp = function (a,b) {
-    if (this.equals(a,b))
-      return 0;
-    else if (this.isNonNeg(this.minus(a, b))) /* a - b >= 0 */
-      return 1;
-    else
-      return -1;
+    return this.sign(this.minus(a, b));
   };
 
   this.cmp = defaultCmp;
@@ -268,11 +253,26 @@ function OrderedRing () {
            defaultCmp.call(this,a,b) < 0 ? this.cmp(a,b) < 0 :
                                            this.cmp(a,b) == 0;
   };
+
+  /** returns the number +1, 0, or -1 to indicate the sign of a */
+  var defaultSign = function(a) {
+    if (this.equals(a, this.zero))
+      return 0;
+    else if (this.isNonNeg(a))
+      return 1;
+    else
+      return -1;
+  }
+
+  this.sign = defaultSign;
+  this.checkSign = function(a) {
+    return this.sign(a) == defaultSign.call(this, a);
+  }
 }
 
 function OrderedField() {
-  OrderedRing.apply(this, []);
-  Field.apply(this, []);
+  OrderedRing.call(this);
+  Field.call(this);
 }
 
 
@@ -318,20 +318,24 @@ function runTests (set, objects) {
   for (var i in set) {
     if (i.startsWith("check") && typeof set[i] === "function") {
 
-      var func = set[i];
+      var func    = set[i];
+      var testSet = func.tests;
 
-      if (tests[func.length] === undefined)
-        tests[func.length] = genTests(objects, func.length);
+      if (testSet === undefined) {
+        if (tests[func.length] === undefined)
+          tests[func.length] = genTests(objects, func.length);
+        testSet = tests[func.length];
+      }
 
       var result = {
-        num:  tests[func.length].length,
+        num:  testSet.length,
         pass: [],
         fail: [],
         exc:  {}
       }
 
-      for (var j in tests[func.length]) try {
-        var test = tests[func.length][j];
+      for (var j in testSet) try {
+        var test = testSet[j];
         if (func.apply(set, test))
           result.pass.push(test);
         else
@@ -356,18 +360,18 @@ var floats = new OrderedField();
 /* reguired implementations */
 floats.equals    = function (a,b) { return a == b; };
 floats.isElement = function (a)   { return typeof a === "number"; };
-floats.zero      = function ()    { return 0.;     };
+floats.zero      = 0.;
 floats.plus      = function (a,b) { return a + b;  };
 floats.neg       = function (a)   { return -a;     };
-floats.one       = function ()    { return 1.;     };
+floats.one       = 1.;
 floats.times     = function (a,b) { return a * b;  };
 floats.inv       = function (a)   { return 1 / a;  };
 floats.isNonNeg  = function (a)   { return a >= 0; };
+floats.toNumber  = function (a)   { return a;      };
 
 /* optimizations */
 floats.ne        = function (a,b) { return a != b; };
 floats.minus     = function (a,b) { return a - b;  };
-floats.two       = function ()    { return 2;      };
 floats.fromInt   = function (n)   { return n;      };
 floats.div       = function (a,b) { return a / b;  };
 floats.lt        = function (a,b) { return a < b;  };
@@ -380,27 +384,37 @@ Object.freeze(floats);
 
 /* fractions implementation ***************************************************/
 
-function Fraction(num, den) {
-  this.num = num;
-  this.den = den;
-
-  this.toString = function () {
-    return this.num.toString() + "/" + this.den.toString();
-  }
-
-  Object.freeze(this);
-}
-
 function FieldOfFractions(ring, reduce) {
-  Field.apply(this, []);
+  Field.call(this);
+
+  function Fraction(num, den) {
+    this.num = num;
+    this.den = den;
+
+    this.toString = function () {
+      if (ring.equals(this.num, ring.zero))
+        return ring.toString(this.num);
+      else if (ring.equals(this.den, ring.one))
+        return ring.toString(this.num);
+      return "(" + this.num.toString() + "/" + this.den.toString() + ")";
+    }
+
+    Object.freeze(this);
+  }
 
   this.reduce = reduce;
 
-  var create = function (a,b) {
-    if (this.reduce == undefined)
-      return new Fraction(a,b);
-    else
-      return Object.create(Fraction, this.reduce(a,b));
+  this.create = function (a,b) {
+    if (b === undefined)
+      b = ring.one;
+
+    if (this.reduce != undefined) {
+      var args = this.reduce(a,b);
+      a = args[0];
+      b = args[1];
+    }
+
+    return new Fraction(a,b);
   };
 
   /* required implementations */
@@ -409,46 +423,56 @@ function FieldOfFractions(ring, reduce) {
   };
 
   this.isElement = function (a) {
-    return ring.isElement(a.num) && ring.isElement(a.den) &&
-          !ring.equals(a.den, ring.zero());
+    return a instanceof Fraction &&
+           ring.isElement(a.num) && ring.isElement(a.den) &&
+          !ring.equals(a.den, ring.zero);
   }
 
-  this.zero = function () {
-    return create(ring.zero(), ring.one());
-  };
+  this.zero = this.create(ring.zero, ring.one);
 
   this.plus = function (a,b) {
-    return create(ring.plus(ring.times(a.num, b.den), ring.times(a.den, b.num)),
+    return this.create(ring.plus(ring.times(a.num, b.den), ring.times(a.den, b.num)),
                   ring.times(a.den, b.den));
   };
 
   this.neg = function (a) {
-    return create(ring.neg(a.num), a.den);
+    return this.create(ring.neg(a.num), a.den);
   };
 
-  this.one = function (a,b) {
-    return create(ring.one(), ring.one());
-  };
+  this.one = this.create(ring.one, ring.one);
 
   this.times = function (a,b) {
-    return create(ring.times(a.num, b.num), ring.times(a.den,b.den));
+    return this.create(ring.times(a.num, b.num), ring.times(a.den,b.den));
   };
 
   this.inv = function (a) {
-    if (ring.equals(a.num, ring.zero()))
+    if (ring.equals(a.num, ring.zero))
       throw("Division by 0");
-    return create(a.den, a.num);
+    return this.create(a.den, a.num);
   };
 
-  this.fromRing = function (a,b) {
+  /* constructors */
+  this.fromRingElems = function (a,b) {
     if (b == undefined)
-      b = ring.one();
-    return create(a,b);
+      b = ring.one;
+    return this.create(a,b);
   };
 
   this.fromInts = function (n1,n2) {
-    return create(ring.fromInt(n1), ring.fromInt(n2));
+    return this.create(ring.fromInt(n1), ring.fromInt(n2));
   };
+
+  this.fromInt = function(n) {
+    return this.create(ring.fromInt(n), ring.one);
+  };
+
+  this.toNumber = function (a) {
+    return ring.toNumber(a.num) / ring.toNumber(a.den);
+  }
+
+  this.toString = function (a) {
+    return a.toString();
+  }
 }
 
 function OrderedFieldOfFractions(orderedRing, reduce) {
@@ -467,23 +491,253 @@ var ints = new OrderedRing();
 /* reguired implementations */
 ints.equals    = function (a,b) { return BigInteger.compare(a,b) == 0; };
 ints.isElement = function (a)   { return a instanceof BigInteger; };
-ints.zero      = function ()    { return BigInteger.ZERO; };
+ints.zero      = BigInteger.ZERO;
 ints.plus      = BigInteger.add;
 ints.neg       = BigInteger.negate;
-ints.one       = function ()    { return BigInteger.ONE; };
+ints.one       = BigInteger.ONE;
 ints.times     = BigInteger.multiply;
-ints.isNonNeg  = function (a)   { return BigInteger.compare(a,0) >= 0; };
+ints.isNonNeg  = function (a) { return BigInteger.compare(a,0) >= 0; };
+ints.toNumber  = function (a) { return a.toJSValue(); };
+ints.toString  = function (a) { return a.toString(); };
 
 /* optimizations */
-floats.minus    = BigInteger.subtract;
-floats.two      = function ()    { return BigInteger(2); };
-floats.fromInt  = BigInteger;
+ints.minus    = BigInteger.subtract;
+ints.fromInt  = BigInteger;
 
 Object.freeze(ints);
 
-var rats = new OrderedFieldOfFractions(ints);
+function gcd(a, b) {
+  /* implementation pseudocode taken from Wikipedia
+   * http://en.wikipedia.org/wiki/Euclidean_algorithm#Implementations
+   *
+   * while b ≠ 0
+   *   t = b
+   *   b = a mod b
+   *   a = t
+   * return a
+   */
+  while (!ints.equals(b, ints.zero)) {
+    var t = b;
+    b = BigInteger.remainder(a, b);
+    a = t;
+  }
+  return a;
+}
+
+function reduce(n, d) {
+  /* check for zero */
+  if (ints.equals(n, ints.zero))
+    return [ints.zero, ints.one];
+  if (ints.equals(d, ints.zero))
+    throw "division by zero";
+
+  /* ensure the denominator is positive */
+  if (!ints.isNonNeg(d)) {
+    n = ints.neg(n);
+    d = ints.neg(d);
+  }
+
+  /* compute gcd and reduce */
+  var cd = gcd(n, d);
+
+  n = BigInteger.divide(n, cd);
+  d = BigInteger.divide(d, cd);
+
+  return [n, d];
+}
+
+var rats    = new OrderedFieldOfFractions(ints, reduce);
 
 Object.freeze(rats);
 
-/******************************************************************************/
+var intrats = new OrderedFieldOfFractions(floats);
+
+Object.freeze(intrats);
+
+/* adjoin root n **************************************************************/
+
+function AdjoinRoot(field, n) {
+  OrderedField.call(this);
+
+  /* a pair representing the number i + j√n */
+  function Elem(i,j) {
+    this.i = i;
+    this.j = j;
+
+    this.toString = function () {
+      if (field.equals(this.j, field.zero))
+        return field.toString(this.i);
+      if (field.equals(this.i, field.zero))
+        return field.toString(this.j) + "√" + field.toString(n);
+      if (field.equals(this.j, field.one))
+        return field.toString(this.i) + " + √" + field.toString(n);
+      if (field.equals(this.j, field.neg(field.one)))
+        return field.toString(this.i) + " - √" + field.toString(n);
+      if (field.isNonNeg(this.j))
+        return field.toString(this.i) + " + " + field.toString(this.j) + "√" + field.toString(n);
+      else
+        return field.toString(this.i) + " - " + field.toString(field.neg(this.j)) + "√" + field.toString(n);
+    };
+
+    Object.freeze(this);
+  }
+
+  this.equals = function (a,b) {
+    return field.equals(a.i, b.i) && field.equals(a.j, b.j);
+  };
+
+  this.isElement = function (a) {
+    return a instanceof Elem && field.isElement(a.i) && field.isElement(a.j);
+  };
+
+  this.zero = new Elem(field.zero, field.zero);
+
+  this.plus = function (a,b) {
+    return new Elem(field.plus(a.i, b.i), field.plus(a.j, b.j));
+  };
+
+  this.neg = function (a) {
+    return new Elem(field.neg(a.i), field.neg(a.j));
+  };
+
+  this.one = new Elem(field.one, field.zero);
+
+  this.times = function (a,b) {
+    return new Elem(field.plus(field.times(a.i, b.i),
+                               field.times(field.times(n, a.j), b.j)),
+                    field.plus(field.times(a.i, b.j),
+                               field.times(a.j, b.i)));
+  };
+
+  this.sqrtN = new Elem(field.zero, field.one);
+
+  var det = function(a) {
+    return field.minus(field.times(a.i, a.i),
+                       field.times(n, field.times(a.j, a.j)));
+  };
+
+  this.inv = function (a) {
+    /* (i + j√n)(i - j√n) = i² - nj²
+     * so 1 / (i + j√n) = (i - j√n) / (i^2 - nj^2)
+     */
+    var denom = det(a);
+    return new Elem(field.div(a.i, denom), field.div(field.neg(a.j), denom));
+  };
+
+  this.isNonNeg = function (a) {
+    var iNN = field.isNonNeg(a.i);
+    var jNN = field.isNonNeg(a.j);
+    if (iNN && jNN)
+      return true;
+    else if (!iNN && !jNN)
+      return false;
+    else if (iNN)
+      return field.isNonNeg(det(a));
+    else
+      return !field.isNonNeg(det(a));
+    return field.isNonNeg(a.j) ?  field.isNonNeg(det(a))
+                               : !field.isNonNeg(det(a));
+  };
+
+  this.toNumber  = function (a) {
+    return field.toNumber(a.i) + field.toNumber(a.j) * Math.sqrt(field.toNumber(n));
+  };
+
+  this.fromFieldElems = function(i,j) {
+    if (j === undefined)
+      j = field.zero;
+    return new Elem(i, j);
+  };
+
+  this.toString = function (a) {
+    return a.toString();
+  }
+}
+
+var root2   = new AdjoinRoot(rats, rats.fromInt(2));
+root2.sqrt2 = root2.sqrtN;
+
+var root23   = new AdjoinRoot(root2, root2.fromInt(3));
+
+root23.sqrt2 = root23.fromFieldElems(root2.sqrt2);
+root23.sqrt3 = root23.sqrtN;
+root23.sqrt6 = root23.fromFieldElems(root2.zero, root2.sqrt2);
+
+root23.two   = root23.fromInt(2);
+root23.half  = root23.inv(root23.two);
+
+root23.sin45 = root23.div(root23.sqrt2, root23.two);
+root23.cos45 = root23.sin45;
+
+/* 30-60-90 triangle has proportions 1 : 2 : √3
+ *   2  ____/|         1  ____/|   
+ *  ___/     | 1      ___/     | 1/2
+ * /---------|       /---------|   
+ *     √3                √3/2        
+ */
+
+root23.cos30 = root23.div(root23.sqrt3, root23.two);
+root23.sin30 = root23.div(root23.one,   root23.two);
+
+root23.sin60 = root23.cos30;
+root23.cos60 = root23.sin30;
+
+/* To find sin and cos of 15, rotate (cos 60, sin 60) by -45 degrees:
+ * ┎        ┒   ┎                     ┒   ┎        ┒
+ * ┃ cos 15 ┃   ┃  (cos 45)  (sin 45) ┃   ┃ cos 60 ┃
+ * ┃        ┃ = ┃                     ┃ * ┃        ┃
+ * ┃ sin 15 ┃   ┃ -(sin 45)  (cos 45) ┃   ┃ sin 60 ┃
+ * ┖        ┚   ┖                     ┚   ┖        ┚
+ */
+
+root23.cos15 = root23.plus (root23.times(root23.cos45, root23.cos60),
+                            root23.times(root23.sin45, root23.sin60));
+root23.sin15 = root23.plus (root23.neg(root23.times(root23.sin45, root23.cos60)),
+                            root23.times(root23.cos45, root23.sin60));
+
+
+/* unit tests */
+
+root23.checkCSIdent = function (n, c,s) {
+  return this.equals(this.plus(this.times(c,c),
+                               this.times(s,s)),
+                     this.one);
+};
+root23.checkCSIdent.tests = [
+  [15, root23.sin15, root23.cos15],
+  [30, root23.sin30, root23.cos30],
+  [45, root23.sin45, root23.cos45],
+  [60, root23.sin60, root23.cos60],
+];
+
+function cosDeg (x) { return Math.cos(x * Math.PI / 180); }
+function sinDeg (x) { return Math.sin(x * Math.PI / 180); }
+
+root23.checkFloatApprox = function (c, func, n) {
+  return Math.abs(root23.toNumber(c) - func.call(null, n)) < 0.000001;
+};
+root23.checkFloatApprox.tests = [
+  [root23.sqrt2, Math.sqrt, 2],
+  [root23.sqrt3, Math.sqrt, 3],
+  [root23.sqrt6, Math.sqrt, 6],
+  [root23.sin15, sinDeg, 15],
+  [root23.cos15, cosDeg, 15],
+  [root23.sin30, sinDeg, 30],
+  [root23.cos30, cosDeg, 30],
+  [root23.sin45, sinDeg, 45],
+  [root23.cos45, cosDeg, 45],
+  [root23.sin60, sinDeg, 60],
+  [root23.cos60, cosDeg, 60],
+];
+
+/* special case printing */
+
+root23.toString = function (a) {
+  return a.i.i.num.toString() + "/"   + a.i.i.den.toString() + " + " +
+         a.i.j.num.toString() + "√2/" + a.i.j.den.toString() + " + " +
+         a.j.i.num.toString() + "√3/" + a.j.i.den.toString() + " + " +
+         a.j.j.num.toString() + "√6/" + a.j.j.den.toString();
+};
+
+Object.freeze(root23);
 
