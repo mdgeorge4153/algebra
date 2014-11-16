@@ -1,136 +1,61 @@
 
+function MathObj () {
+}
+
+MathObj.prototype.addAxiom = function (property, args) {
+};
+
+MathObj.prototype.addDefault = function (name, func) {
+  this[name] = func;
+};
+
 /* interfaces *****************************************************************/
 
-function Set() {
-  this.isElement = function (a)   { throw("unimplemented function isElement"); };
-  this.equals    = function (a,b) { throw("unimplemented function equals"); };
+Set  = new Structure();
+Set.addType("Element");
 
-  /* axiom unit tests */
-  this.checkEqReflexive = function (a) {
-    return this.equals(a,a);
-  };
+Set.require("equals", [Set.Element, Set.Element], Set.Bool);
 
-  this.checkEqSymmetric = function (a,b) {
-    return this.equals(a,b) == this.equals(b,a);
-  };
+Set.check(reflexive,  "equals");
+Set.check(transitive, "equals");
+Set.check(symmetric,  "equals");
 
-  this.checkEqTransitive = function (a,b,c) {
-    return this.equals(a,b) && this.equals(b,c) ? this.equals(a,c) : true;
-  };
+Set.addDefault("ne", [Set.Element, Set.Element], Set.Bool,
+  function (a,b) { return !this.equals(a,b); }
+);
 
-  this.checkTrue = function () {
-    return true;
-  };
 
-  this.checkN = function (n) {
-    return n == 1;
-  };
-  this.checkN.tests = [[1]];
+Group = new Structure(Set);
 
-  /* helper functions */
+Group.require("plus", [Group.Element, Group.Element], Group.Element);
+Group.require("zero", [],                             Group.Element);
+Group.require("neg",  [Group.Element],                Group.Element);
 
-  var neDefault = function (a,b) {
-    return !this.equals(a,b);
-  };
+Group.check(commutative, "plus");
+Group.check(associative, "plus");
+Group.check(hasIdentity, "plus", "zero");
+Group.check(hasInverses, "plus", "neg");
 
-  this.ne = neDefault;
-  this.checkNe = function (a,b) {
-    return this.ne(a,b) == neDefault.call(this, a, b);
-  };
-}
+Group.addDefault("minus",  function (a,b) { return this.plus(a, this.neg(b)); });
+Group.addDefault("isZero", function (a)   { return this.equals(a, this.zero); });
 
-function Group() {
-  Set.call(this);
 
-  this.zero  = undefined;
-  this.plus  = function (a,b) { throw("unimplemented function plus"); };
-  this.neg   = function (a)   { throw("unimplemented function neg"); };
 
-  /* axiom unit tests */
-  this.checkZeroClosed = function () {
-    return this.isElement(this.zero);
-  }
+Ring = new Structure(Group);
 
-  this.checkPlusClosed = function (a,b) {
-    return this.isElement(this.plus(a,b));
-  }
+Ring.require("one");
+Ring.require("times");
 
-  this.checkNegClosed = function (a) {
-    return this.isElement(this.neg(a));
-  }
+Ring.check(closed, "one");
+Ring.check(closed, "times");
 
-  this.checkPlusIdent = function (a) {
-    return this.equals(this.plus(this.zero, a),
-                       a);
-  };
+Ring.check(commutative,  "times");
+Ring.check(associative,  "times");
+Ring.check(hasIdentity,  "times", "one");
+Ring.check(distributive, "times", "plus");
 
-  this.checkPlusAssoc = function (a,b,c) {
-    return this.equals(this.plus(this.plus(a, b), c),
-                       this.plus(a, this.plus(b, c)));
-  };
-
-  this.checkPlusInverse = function (a) {
-    return this.equals(this.plus(a, this.neg(a)),
-                       this.zero);
-  };
-
-  this.checkPlusCommutative = function (a,b) {
-    return this.equals(this.plus(a, b),
-                       this.plus(b, a));
-  };
-
-  /* helper functions */
-  var minusDefault = function (a,b) { return this.plus(a, this.neg(b)); };
-
-  this.minus      = minusDefault;
-  this.checkMinus = function (a,b) {
-    return this.equals(this.minus(a,b),
-                       minusDefault.call(this,a,b));
-  }
-
-  var isZeroDefault = function (a) { return this.equals(a, this.zero); };
-
-  this.isZero = isZeroDefault;
-  this.checkIsZero = function (a) {
-    return this.isZero(a) == isZeroDefault.call(this, a);
-  }
-}
-
-function Ring() {
-  Group.call(this);
-
-  this.one   = undefined;
-  this.times = function (a,b) { throw("unimplemented function times"); };
-
-  /* axiom unit tests */
-  this.checkOneClosed = function () {
-    return this.isElement(this.one);
-  };
-
-  this.checkTimesClosed = function (a,b) {
-    return this.isElement(this.times(a,b));
-  }
-
-  this.checkMultAssoc = function(a,b,c) {
-    return this.equals(this.times(this.times(a,b), c),
-                       this.times(a, this.times(b,c)));
-  };
-
-  this.checkMultIdent = function (a) {
-    return this.equals(this.times(a, this.one), a);
-  };
-
-  this.checkMultCommutative = function (a,b) {
-    return this.equals(this.times(a, b), this.times(b, a));
-  };
-
-  this.checkDistributive = function (a,b,c) {
-    return this.equals(this.times(a, this.plus(b, c)),
-                       this.plus(this.times(a, b), this.times(a, c)));
-  };
-
-  /* helper functions */
-  var fromIntDefault = function (n) {
+Ring.addDefault("fromInt", [Ring.Int], Ring.Element,
+  function (n) {
     if (n < 0)
       return this.neg(this.fromInt(-n));
     else if (n == 0)
@@ -140,42 +65,22 @@ function Ring() {
       var rest = fromIntDefault.call(this, Math.floor(n / 2));
       return this.plus(this.plus(rest, rest), bit);
     }
-  };
-
-  this.fromInt = fromIntDefault;
-  this.checkFromInt = function (n) {
-    return this.equals(this.fromInt(n), fromIntDefault.call(this,n));
   }
-  this.checkFromInt.tests = [[-10000], [-37], [-1], [0], [1], [42], [99], [1000]];
-}
+);
 
-function Field () {
-  Ring.call(this);
 
-  this.inv = function (a) { throw("unimplemented function inv"); };
 
-  /* axiom unit tests */
-  this.checkInverseClosed = function (a) {
-    return this.isZero(a) ? true : this.isElement(this.inv(a));
-  }
+Field = new Structure(Ring);
 
-  this.checkInverse = function (a) {
-    return this.isZero(a) ? true
-                          : this.equals(this.times(a, this.inv(a)), this.one);
-  };
+Field.require("inv", [Field.Element], Field.Element);
 
-  /* helper functions */
-  var divDefault = function (a, b) {
+Field.check(hasInversesExcept, "times", "one", "zero");
+
+Field.addDefault("div", [Field.Element, Field.Element], Field.Element,
+  function (a, b) {
     return this.times(a, this.inv(b));
-  };
-
-  this.div = divDefault;
-  this.checkDiv = function (a,b) {
-    return this.isZero(b)
-      ? true
-      : this.equals(this.div(a,b), divDefault.call(this,a,b));
   }
-}
+);
 
 var GT = 1;
 var EQ = 0;
