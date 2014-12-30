@@ -1,22 +1,42 @@
 
 /* interfaces *****************************************************************/
 
-Set = new MathObj();
-
-
-Group
-
 function Set() {
   this.isElement = function (a)   { throw("unimplemented function isElement"); };
   this.equals    = function (a,b) { throw("unimplemented function equals"); };
 
-  check(reflexive, equals);
-  check(symmetric, equals);
-  check(transitive, equals);
+  /* axiom unit tests */
+  this.checkEqReflexive = function (a) {
+    return this.equals(a,a);
+  };
 
-  addDefault("neq", function (a,b) {
-    return !(this.equals(a,b));
-  });
+  this.checkEqSymmetric = function (a,b) {
+    return this.equals(a,b) == this.equals(b,a);
+  };
+
+  this.checkEqTransitive = function (a,b,c) {
+    return this.equals(a,b) && this.equals(b,c) ? this.equals(a,c) : true;
+  };
+
+  this.checkTrue = function () {
+    return true;
+  };
+
+  this.checkN = function (n) {
+    return n == 1;
+  };
+  this.checkN.tests = [[1]];
+
+  /* helper functions */
+
+  var neDefault = function (a,b) {
+    return !this.equals(a,b);
+  };
+
+  this.ne = neDefault;
+  this.checkNe = function (a,b) {
+    return this.ne(a,b) == neDefault.call(this, a, b);
+  };
 }
 
 function Group() {
