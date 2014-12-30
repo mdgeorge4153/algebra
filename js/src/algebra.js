@@ -1,9 +1,9 @@
-define(["interfaces"], function (iface) {
+define(["interfaces"], function (Interface) {
 
 var exports = {};
 
 /******************************************************************************/
-var Set    = new iface.Interface();
+var Set    = new Interface();
 
 var E      = Set.hasTypeParam("E");
 var equals = Set.hasOperation("equals", E, E, bool);
@@ -11,16 +11,17 @@ var equals = Set.hasOperation("equals", E, E, bool);
 Set.requires(equals, isReflexive);
 Set.requires(equals, isTransitive);
 Set.requires(equals, isSymmetric);
+Set.requires(equals, isEquality);
 
 Set.addDefaultOperation("neq", E, E, bool,
-  function (a, b) { return !this.equals(a, b); }
+  function (a, b) { return ! this.equals(a, b); }
 );
 
 Set.seal();
 exports.Set = Set;
 
 /******************************************************************************/
-var Monoid = new iface.Interface();
+var Monoid = new Interface();
 
 Monoid.isA(Set);
 
@@ -34,7 +35,7 @@ Monoid.seal();
 exports.Monoid = Monoid;
 
 /******************************************************************************/
-var Group = new iface.Interface();
+var Group = new Interface();
 
 Group.isA(Monoid);
 
@@ -54,7 +55,7 @@ Group.seal();
 exports.Group = Group;
 
 /******************************************************************************/
-var AbelianGroup = new iface.Interface();
+var AbelianGroup = new Interface();
 
 AbelianGroup.isA(Group);
 
@@ -64,7 +65,7 @@ AbelianGroup.seal();
 exports.AbelianGroup = AbelianGroup;
 
 /******************************************************************************/
-var Ring = new iface.Interface();
+var Ring = new Interface();
 
 Ring.isA(AbelianGroup);
 
@@ -104,7 +105,7 @@ Ring.seal();
 exports.Ring = Ring;
 
 /******************************************************************************/
-var Field = new iface.Interface();
+var Field = new Interface();
 
 Field.isA(Ring);
 
@@ -114,7 +115,7 @@ Field.seal();
 exports.Field = Field;
 
 /******************************************************************************/
-var OrderedRing = new iface.Interface();
+var OrderedRing = new Interface();
 
 OrderedRing.isA(Ring);
 
@@ -154,14 +155,14 @@ OrderedRing.seal();
 exports.OrderedRing = OrderedRing;
 
 /******************************************************************************/
-var OrderedField = new iface.Interface();
+var OrderedField = new Interface();
 
 OrderedField.isA(OrderedRing);
 OrderedField.isA(Field);
 
 /******************************************************************************/
 function ModuleOver(r) {
-  var Module = new iface.Interface();
+  var Module = new Interface();
   var S      = r.E;
 
   Module.isA(AbelianGroup);
@@ -182,7 +183,7 @@ exports.ModuleOver = ModuleOver;
 
 /******************************************************************************/
 function VectorSpaceOver(f) {
-  var VectorSpace = new iface.Interface();
+  var VectorSpace = new Interface();
 
   VectorSpace.isA(ModuleOver(f));
 
