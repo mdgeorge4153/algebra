@@ -1,3 +1,4 @@
+define(function () {
 /*
 	JavaScript BigInteger library version 0.9
 	http://silentmatt.com/biginteger/
@@ -1619,3 +1620,8 @@ BigInteger.MAX_EXP = BigInteger(0x7FFFFFFF);
 if (typeof exports !== 'undefined') {
 	exports.BigInteger = BigInteger;
 }
+
+
+return BigInteger;
+}
+

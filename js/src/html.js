@@ -1,3 +1,5 @@
+define(function() {
+
 /**
  * html.js
  *
@@ -20,8 +22,6 @@ function example () {
                  P("another paragraph")),
               TD(IMG({"src":"foo.jpg", "title":"foo"}))));
 }
-
-
 
 function mkNodeFunction (name) {
   return function () {
@@ -47,8 +47,14 @@ function mkNodeFunction (name) {
   }
 }
 
+var module = {};
+
+module.example = example;
 var tags = ["P","TABLE","TR","TH","TD","UL","OL","LI","B", "IMG", "H1", "H2", "H3", "H4"];
+
 for (var i in tags)
-  this[tags[i]] = mkNodeFunction(tags[i].toLowerCase());
+  module[tags[i]] = mkNodeFunction(tags[i].toLowerCase());
 
+return module;
 
+}
