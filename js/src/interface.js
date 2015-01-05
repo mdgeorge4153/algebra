@@ -9,6 +9,7 @@ function Interface () {
 }
 
 Interface.isImplementation = function isImplementation (inter, impl) {
+  /* TODO: this isn't right...doesn't account for super interfaces. */
   return "interfaces" in impl && impl.interfaces.indexOf(inter) != -1;
 };
 
