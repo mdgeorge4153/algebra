@@ -8,6 +8,10 @@ function Interface () {
   this.defaults     = {}; /* name -> impl (types are in this.operations) */
 }
 
+Interface.isImplementation = function isImplementation (inter, impl) {
+  return "interfaces" in impl && impl.interfaces.indexOf(inter) != -1;
+};
+
 function typeEq(t1, t2) {
   if (t1.length !== t2.length)
     return false;
