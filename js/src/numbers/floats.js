@@ -1,13 +1,12 @@
 /* float implementation *******************************************************/
 
-define(["algebra"],
-function(algebra) {
+define(["algebra", "interface"],
+function(algebra,   Interface) {
 
 var floats = {};
 
 /* reguired implementations */
 floats.equals    = function (a,b) { return a == b; };
-floats.isElement = function (a)   { return typeof a === "number"; };
 floats.zero      = 0.;
 floats.plus      = function (a,b) { return a + b;  };
 floats.neg       = function (a)   { return -a;     };
@@ -29,6 +28,8 @@ floats.ge        = function (a,b) { return a >= b; };
 floats.cmp       = floats.minus;
 
 algebra.OrderedField.instantiate(floats);
+
+floats.floatSpec = Interface.numberSpec;
 
 return floats;
 
