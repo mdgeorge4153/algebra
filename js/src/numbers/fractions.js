@@ -4,7 +4,6 @@ define(["algebra"],
 function(algebra) {
 
 function FieldOfFractions(ring, reduce) {
-  Field.call(this);
 
   function Fraction(num, den) {
     this.num = num;

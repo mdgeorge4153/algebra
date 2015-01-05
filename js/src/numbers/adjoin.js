@@ -1,8 +1,9 @@
 /* adjoin root n **************************************************************/
 
-function AdjoinRoot(field, n) {
-  OrderedField.call(this);
+define(["algebra"],
+function(algebra) {
 
+function AdjoinRoot(field, n) {
   /* a pair representing the number i + j√n */
   function Elem(i,j) {
     this.i = i;
@@ -97,4 +98,6 @@ function AdjoinRoot(field, n) {
     return a.toString();
   }
 }
+
+});
 
