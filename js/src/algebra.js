@@ -28,7 +28,8 @@ var Monoid = new Interface();
 Monoid.isA(Set);
 
 var plus = Monoid.hasOperation("plus", E, E, E);
-var zero = Monoid.hasOperation("zero", E);
+
+var zero = Monoid.hasProperty("zero", E);
 
 Monoid.requires(plus, hasIdentity, zero);
 Monoid.requires(plus, isAssociative);
@@ -72,8 +73,8 @@ var Ring = new Interface();
 Ring.isA(AbelianGroup);
 
 var times  = Ring.hasOperation("times", E, E, E);
-var one    = Ring.hasOperation("one", E);
 var isUnit = Ring.hasOperation("isUnit", E, Interface.bool);
+var one    = Ring.hasProperty ("one",   E);
 
 var inv    = Ring.hasOperation("inv", E, E);
 
@@ -161,6 +162,9 @@ var OrderedField = new Interface();
 
 OrderedField.isA(OrderedRing);
 OrderedField.isA(Field);
+
+Object.freeze(OrderedField);
+exports.OrderedField = OrderedField;
 
 /******************************************************************************/
 function ModuleOver(r) {

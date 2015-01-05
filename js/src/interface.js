@@ -31,6 +31,10 @@ Interface.prototype.hasOperation = function(name, type) {
   /* TODO */
 };
 
+Interface.prototype.hasProperty = function(name, type) {
+  /* TODO */
+};
+
 Interface.prototype.requires = function(operation, property, args) {
   /* TODO */
 };
@@ -40,7 +44,7 @@ Interface.prototype.addDefaultOperation = function(name, type, impl) {
     throw "Default operation already exists in interface";
 
   impl = arguments[arguments.length - 1];
-  type = Array.slice(arguments, 1, arguments.length - 1);
+  type = Array.prototype.slice.call(arguments, 1, arguments.length - 1);
 
   /* TODO: store type */
   this.defaults[name] = impl;
@@ -50,7 +54,7 @@ Interface.prototype.instantiate = function (impl) {
   /* add inherited (default) methods */
 
   for (var method in this.defaults)
-    if (!method in impl)
+    if (!(method in impl))
       impl[method] = this.defaults[method];
 
   /* TODO: add check method */
