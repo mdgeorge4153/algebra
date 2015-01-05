@@ -56,6 +56,10 @@ function Mat2(field) {
     );
   };
 
+  M.one = new Matrix(field.one, field.zero,
+                     field.zero, field.one);
+  Object.freeze(M.one);
+
   M.isUnit = function isUnit(m) {
     return field.isUnit(det(m));
   };
@@ -97,6 +101,11 @@ function Mat2(field) {
       field.plus(field.times(m.xx, v.x), field.times(m.yx, v.y)),
       field.plus(field.times(m.xy, v.x), field.times(m.yy, v.y))
     );
+  };
+
+  M.rotation = function (cos, sin) {
+    return new Matrix(cos, field.neg(sin),
+                      sin, cos);
   };
 
   algebra.VectorSpaceOver(f).instantiate(M);
