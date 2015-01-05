@@ -1,14 +1,18 @@
 define(["algebra"],
 function(algebra) {
 
-function Vector(x,y) {
-  this.x = x;
-  this.y = y;
-}
-
 function Vec2(field) {
 
   var V = {};
+
+  V.Vector = function Vector(x,y) {
+    this.x = x;
+    this.y = y;
+  };
+
+  V.isElem = function isElem(v) {
+    return v instanceof V.Vector && field.isElem(v.x) && field.isElem(v.y);
+  };
 
   V.equals = function equals(v1, v2) {
     return field.equals(v1.x, v2.x) && field.equals(v1.y, v2.y);

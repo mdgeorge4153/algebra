@@ -1,5 +1,5 @@
 define(["interface", "properties"],
-function(Interface,    props) {
+function(Interface,   props) {
 with(props) {
 
 var exports = {};
@@ -9,6 +9,9 @@ var Set    = new Interface();
 
 var E      = Set.hasTypeParam("E");
 var equals = Set.hasOperation("equals", [E, E, Interface.bool]);
+var isElem = Set.hasOperation("isElem", [E, Interface.bool]);
+
+Set.requires(isElem, isTrue);
 
 Set.requires(equals, isReflexive);
 Set.requires(equals, isTransitive);
@@ -81,7 +84,6 @@ var inv    = Ring.hasOperation("inv", [E, E]);
 Ring.requires(times, isAssociative);
 Ring.requires(times, distributesOver, plus);
 
-Ring.requires(times, isCommutative);
 Ring.requires(times, hasIdentity, one);
 
 Ring.requires(inv, isInverseIf, isUnit, one);
@@ -108,9 +110,18 @@ Object.freeze(Ring);
 exports.Ring = Ring;
 
 /******************************************************************************/
+var CommRing = new Interface();
+
+CommRing.isA(Ring);
+CommRing.requires(times, isCommutative);
+
+Object.freeze(CommRing);
+exports.CommRing = CommRing;
+
+/******************************************************************************/
 var Field = new Interface();
 
-Field.isA(Ring);
+Field.isA(CommRing);
 
 Field.requires(isUnit, isTrueUnless, "isZero");
 

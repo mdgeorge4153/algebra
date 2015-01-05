@@ -5,6 +5,7 @@ var ints = {};
 
 /* reguired implementations */
 ints.equals    = function (a,b) { return BigInteger.compare(a,b) == 0; };
+ints.isElem    = function (a)   { return a instanceof BigInteger; };
 ints.zero      = BigInteger.ZERO;
 ints.plus      = BigInteger.add;
 ints.neg       = BigInteger.negate;

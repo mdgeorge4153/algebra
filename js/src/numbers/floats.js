@@ -7,6 +7,7 @@ var floats = {};
 
 /* reguired implementations */
 floats.equals    = function (a,b) { return a == b; };
+floats.isElem    = function (a)   { return typeof a === "number"; };
 floats.zero      = 0.;
 floats.plus      = function (a,b) { return a + b;  };
 floats.neg       = function (a)   { return -a;     };
