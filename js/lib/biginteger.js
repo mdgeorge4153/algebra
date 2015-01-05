@@ -1623,5 +1623,5 @@ if (typeof exports !== 'undefined') {
 
 
 return BigInteger;
-}
+});
 

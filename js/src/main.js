@@ -5,8 +5,8 @@ requirejs.config({
   }
 });
 
-require(["html", "lib/domReady!", "algebra"],
-function( html,   doc,             algebra ) {
+require(["html", "lib/domReady!", "numbers/floats"],
+function( html,   doc,             floats ) {
 
 doc.body.appendChild(html.example());
 

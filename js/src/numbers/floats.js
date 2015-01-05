@@ -29,7 +29,6 @@ floats.ge        = function (a,b) { return a >= b; };
 floats.cmp       = floats.minus;
 
 algebra.OrderedField.instantiate(floats);
-Object.freeze(floats);
 
 return floats;
 

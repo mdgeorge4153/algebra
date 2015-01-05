@@ -1,4 +1,4 @@
-define(["algebra", "biginteger"],
+define(["algebra", "lib/biginteger"],
 function(algebra,   BigInteger) {
 
 var ints = {};
@@ -19,8 +19,7 @@ ints.toString  = function (a) { return a.toString(); };
 ints.minus    = BigInteger.subtract;
 ints.fromInt  = BigInteger;
 
-Object.freeze(ints);
-
+algebra.OrderedRing.instantiate(ints);
 return ints;
 
 });
