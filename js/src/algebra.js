@@ -8,15 +8,15 @@ var exports = {};
 var Set    = new Interface();
 
 var E      = Set.hasTypeParam("E");
-var equals = Set.hasOperation("equals", E, E, Interface.bool);
+var equals = Set.hasOperation("equals", [E, E, Interface.bool]);
 
 Set.requires(equals, isReflexive);
 Set.requires(equals, isTransitive);
 Set.requires(equals, isSymmetric);
 Set.requires(equals, isEquality);
 
-Set.addDefaultOperation("neq", E, E, Interface.bool,
-  function (a, b) { return ! this.equals(a, b); }
+Set.addDefaultOperation("neq", [E, E, Interface.bool],
+  function neq (a, b) { return ! this.equals(a, b); }
 );
 
 Object.freeze(Set);
@@ -27,7 +27,7 @@ var Monoid = new Interface();
 
 Monoid.isA(Set);
 
-var plus = Monoid.hasOperation("plus", E, E, E);
+var plus = Monoid.hasOperation("plus", [E, E, E]);
 
 var zero = Monoid.hasProperty("zero", E);
 
@@ -42,16 +42,16 @@ var Group = new Interface();
 
 Group.isA(Monoid);
 
-var neg = Group.hasOperation("neg", E, E);
+var neg = Group.hasOperation("neg", [E, E]);
 
 Group.requires(plus, hasInverse, neg, zero);
 
-Group.addDefaultOperation("minus", E, E, E,
-  function (a, b) { return this.plus(a, this.neg(b)); }
+Group.addDefaultOperation("minus", [E, E, E],
+  function minus (a, b) { return this.plus(a, this.neg(b)); }
 );
 
-Group.addDefaultOperation("isZero", E, Interface.bool,
-  function (a) { return this.equals(a, this.zero()); }
+Group.addDefaultOperation("isZero", [E, Interface.bool],
+  function isZero (a) { return this.equals(a, this.zero()); }
 );
 
 Object.freeze(Group);
@@ -72,11 +72,11 @@ var Ring = new Interface();
 
 Ring.isA(AbelianGroup);
 
-var times  = Ring.hasOperation("times", E, E, E);
-var isUnit = Ring.hasOperation("isUnit", E, Interface.bool);
-var one    = Ring.hasProperty ("one",   E);
+var times  = Ring.hasOperation("times",  [E, E, E]);
+var isUnit = Ring.hasOperation("isUnit", [E, Interface.bool]);
+var one    = Ring.hasProperty ("one",    E);
 
-var inv    = Ring.hasOperation("inv", E, E);
+var inv    = Ring.hasOperation("inv", [E, E]);
 
 Ring.requires(times, isAssociative);
 Ring.requires(times, distributesOver, plus);
@@ -86,11 +86,11 @@ Ring.requires(times, hasIdentity, one);
 
 Ring.requires(inv, isInverseIf, isUnit, one);
 
-Ring.addDefaultOperation("div", E, E, E,
-  function (a, b) { return this.times(a, this.inv(b)); }
+Ring.addDefaultOperation("div", [E, E, E],
+  function div (a, b) { return this.times(a, this.inv(b)); }
 );
 
-Ring.addDefaultOperation("fromInt", Interface.integer, E,
+Ring.addDefaultOperation("fromInt", [Interface.integer, E],
   function fromInt (n) {
     if (n < 0)
       return this.neg(this.fromInt(-n));
@@ -122,36 +122,36 @@ var OrderedRing = new Interface();
 
 OrderedRing.isA(Ring);
 
-var isNonNeg = OrderedRing.hasOperation("isNonNeg", E, Interface.bool);
+var isNonNeg = OrderedRing.hasOperation("isNonNeg", [E, Interface.bool]);
 
 OrderedRing.requires(isNonNeg, trueOfMinusOne);
 OrderedRing.requires(isNonNeg, trueOfSquares);
 OrderedRing.requires(isNonNeg, preservedBy, plus);
 OrderedRing.requires(isNonNeg, preservedBy, times);
 
-OrderedRing.addDefaultOperation("le", E, E, Interface.bool,
-  function (a, b) { return this.isNonNeg(this.minus(b, a)); }
+OrderedRing.addDefaultOperation("le", [E, E, Interface.bool],
+  function le (a, b) { return this.isNonNeg(this.minus(b, a)); }
 );
 
-OrderedRing.addDefaultOperation("lt", E, E, Interface.bool,
-  function (a, b) { throw "TODO"; }
+OrderedRing.addDefaultOperation("lt", [E, E, Interface.bool],
+  function lt (a, b) { throw "TODO"; }
 );
 
-OrderedRing.addDefaultOperation("ge", E, E, Interface.bool,
-  function (a, b) { throw "TODO"; }
+OrderedRing.addDefaultOperation("ge", [E, E, Interface.bool],
+  function ge (a, b) { throw "TODO"; }
 );
 
-OrderedRing.addDefaultOperation("gt", E, E, Interface.bool,
-  function (a, b) { throw "TODO"; }
+OrderedRing.addDefaultOperation("gt", [E, E, Interface.bool],
+  function gt (a, b) { throw "TODO"; }
 );
 
-OrderedRing.addDefaultOperation("cmp", E, E, Interface.integer,
-  function (a, b) { throw "TODO"; }
+OrderedRing.addDefaultOperation("cmp", [E, E, Interface.integer],
+  function cmp (a, b) { throw "TODO"; }
 );
 
 /* TODO: sign more useful if it returns E or integer? */
-OrderedRing.addDefaultOperation("sign", E, Interface.integer,
-  function (a, b) { throw "TODO"; }
+OrderedRing.addDefaultOperation("sign", [E, Interface.integer],
+  function sign (a, b) { throw "TODO"; }
 );
 
 Object.freeze(OrderedRing);
@@ -173,7 +173,7 @@ function ModuleOver(r) {
 
   Module.isA(AbelianGroup);
 
-  Module.hasOperation("smult", S, E, E);
+  Module.hasOperation("smult", [S, E, E]);
 
   Module.requires(r,     isA, Ring);
   Module.requires(times, distributesOver, r.plus);
@@ -201,4 +201,5 @@ function VectorSpaceOver(f) {
 };
 
 return exports;
+
 }});
