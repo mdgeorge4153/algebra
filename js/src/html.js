@@ -17,7 +17,7 @@ var Html = {};
 
 /* here are the available functions: */
 
-var tags = ["P","TABLE","TR","TH","TD","UL","OL","LI","B", "IMG", "H1", "H2", "H3", "H4"];
+var tags = ["P","TABLE","TR","TH","TD","UL","OL","LI","B", "I", "IMG", "H1", "H2", "H3", "H4"];
 
 /*
  * here is an example.  To include the example, simply call
@@ -32,7 +32,7 @@ Html.example = function () {
               TH({"class":"col2"}, "column 2 header")),
            TR(TD(P("a paragraph"),
                  P("another paragraph")),
-              TD(IMG({"src":"foo.jpg", "title":"foo"}))));
+              TD(P(B("some bold "), I("and italicized "), "text"))));
   }
 }
 
