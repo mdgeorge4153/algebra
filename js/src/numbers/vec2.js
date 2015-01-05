@@ -1,5 +1,5 @@
-define(["algebra"],
-function(algebra) {
+define(["algebra", "util"],
+function(algebra,   Util) {
 
 function Vec2(field) {
 
@@ -8,7 +8,10 @@ function Vec2(field) {
   V.Vector = function Vector(x,y) {
     this.x = x;
     this.y = y;
+    Object.seal(this);
   };
+
+  V.field  = field;
 
   V.isElem = function isElem(v) {
     return v instanceof V.Vector && field.isElem(v.x) && field.isElem(v.y);
@@ -38,10 +41,24 @@ function Vec2(field) {
   else
     algebra.Module.instantiate(V);
 
+  /****************************************************************************/
+
+  V.dot = function dot (v1, v2) {
+    return field.plus(field.times(v1.x, v2.x), field.times(v1.y, v2.y));
+  };
+
+  V.perp = function perp (v) {
+    return new Vector(field.neg(v.y), v.x);
+  };
+
+  V.cross = function cross (v1, v2) {
+    return V.dot(v1, V.perp(v2));
+  };
+
   Object.freeze(V);
   return V;
 }
 
-return Vec2;
+return Util.memoize(Vec2);
 
 });
