@@ -3,7 +3,7 @@ define(function() {
 function Interface () {
   this.types        = []; /* list of strings */
   this.requirements = []; /* TODO */
-  this.operations   = {}; /* name -> type [args, return] */
+  this.operations   = {}; /* name -> [arg types, return type] */
   this.properties   = {}; /* name -> type */
   this.defaults     = {}; /* name -> impl (types are in this.operations) */
 }
