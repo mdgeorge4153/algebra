@@ -1,5 +1,5 @@
-define(["interface", "properties"],
-function(Interface,   props) {
+define(["interface", "properties", "util"],
+function(Interface,   props,        Util) {
 with(props) {
 
 var exports = {};
@@ -178,6 +178,7 @@ Object.freeze(OrderedField);
 exports.OrderedField = OrderedField;
 
 /******************************************************************************/
+
 function ModuleOver(r) {
   var Module = new Interface();
   var S      = r.E;
@@ -191,14 +192,13 @@ function ModuleOver(r) {
   Module.requires(times, associatesOver, r.times);
 
   Object.freeze(Module);
-
   return Module;
 };
 
-
-exports.ModuleOver = ModuleOver;
+exports.ModuleOver = Util.memoize(ModuleOver);
 
 /******************************************************************************/
+
 function VectorSpaceOver(f) {
   var VectorSpace = new Interface();
 
@@ -207,9 +207,12 @@ function VectorSpaceOver(f) {
   VectorSpace.requires(f, isA, Field);
 
   Object.freeze(VectorSpace);
-
   return VectorSpace;
 };
+
+exports.VectorSpaceOver = Util.memoize(VectorSpaceOver);
+
+/******************************************************************************/
 
 return exports;
 
