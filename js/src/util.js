@@ -10,6 +10,5 @@ memoize: function memoize(f) {
     memoTable[x] = result;
     return result;
   };
-};
-
+}
 });
