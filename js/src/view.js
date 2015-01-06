@@ -50,6 +50,7 @@ function repaint(time) {
     }
     context.restore();
   
+    /* Draws the mouse for debugging purposes.
     if (mousePos !== null) {
       context.beginPath();
       var pos = fromVec(mousePos);
@@ -61,6 +62,7 @@ function repaint(time) {
                        ")",
   		     pos[0] + 20, pos[1] + 20)
     }
+    */
   
     window.requestAnimationFrame(repaint.bind(this));
   }
