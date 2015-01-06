@@ -21,13 +21,13 @@ return function Model (F) {
   }
 
   Tan.prototype.contains = function contains(pt) {
-    return true;
-    /* TODO
-    var cmp = G.compareSlopeFrom(pt);
+    var cmp = G.cmpSlopeFrom(pt);
 
-    for (var i in this.coords)
-      if (cmp(this.coords[i], this.coords[(i + 1) % this.coords.length])
-    */
+    for (var i = 0; i < this.coords.length; i++)
+      if (cmp(this.coords[i], this.coords[(i + 1) % this.coords.length]) < 0)
+        return false;
+
+    return true;
   };
 
   /****************************************************************************/

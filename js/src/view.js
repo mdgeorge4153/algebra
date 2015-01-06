@@ -32,7 +32,10 @@ function repaint(time) {
     for (var i in model.tans) {
       context.beginPath();
   
-      context.fillStyle = "blue";
+      if (i === model.selection)
+        context.fillStyle = "#8080FF";
+      else
+        context.fillStyle = "blue";
       context.strokeStyle = "black";
       context.lineWidth   = 1;
   

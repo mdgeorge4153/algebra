@@ -2,12 +2,12 @@ define(["util"],
 function(Util) {
 function Geom (V) {
 
-var F = V.field;
+var F = V.F;
 
 var G = {F: F, V: V};
 
 function cmpPoints(v1, v2) {
-  with (field) {
+  with (F) {
     var xcmp = cmp(v1.x, v2.x);
     return xcmp === EQ ? cmp(v1.y, v2.y) : xcmp;
   };
@@ -20,7 +20,7 @@ G.cmpPoints = cmpPoints;
  */
 function cmpSlopeFrom (v) {
   return function (v1, v2) {
-    return field.sign(this.cross(this.minus(v2, v), this.minus(v1, v)));
+    return F.sign(V.cross(V.minus(v2, v), V.minus(v1, v)));
   };
 };
 
@@ -37,7 +37,7 @@ function segmentIntersect(p1, p2, q1, q2) {
 
   var det = this.cross(dq, dp);
 
-  if (field.equals(det, zero))
+  if (F.equals(det, zero))
     /* lines are parallel, no ix */
     return null;
 
@@ -47,7 +47,7 @@ function segmentIntersect(p1, p2, q1, q2) {
   var x  = this.plus(p1, this.smult(t, dp));
 
   /* there is an intersection if 0 ≤ s ≤ 1 and 0 ≤ t ≤ 1 */
-  with (field) {
+  with (F) {
     if (leq(zero, s) && leq(s, one) && leq(zero, t) && leq(t, one))
       return x;
     else
