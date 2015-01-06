@@ -1,39 +1,5 @@
 
 function VectorSpace(field) {
-  this.Vector = function (x,y) {
-    this.x = x;
-    this.y = y;
-    Object.freeze(this);
-  };
-
-  this.dot = function (v1, v2) (
-    with (field) { return plus(times(v1.x, v2.x), times(v1.y, v2.y)); };
-  };
-
-  this.smult = function (s, v) {
-    with (field) { return new this.Vector(times(s, v.x), times(s, v.y)); };
-  };
-
-  this.plus = function (v1,v2) {
-    with (field) { return new this.Vector(plus(v1.x, v2.x), plus(v1.y, v2.y)); };
-  };
-
-  this.neg = function (v) {
-    with (field) { return new this.Vector(neg(v.x), neg(v.y)); };
-  };
-
-  this.minus = function (v1, v2) {
-    with (field) { return new this.Vector(minus(v1.x, v2.x), minus(v1.y, v2.y)); };
-  };
-
-  this.cross = function (v1, v2) {
-    with (field) { return minus(times(v1.x, v2.y), times(v1.y, v2.x)); };
-  };
-
-  this.toString = function (v) {
-    return "(" + field.toString(v.x) + ", " + field.toString(v.y) + ")";
-  };
-
   this.cmpPoints = function (v1, v2) {
     with (field) {
       var xcmp = cmp(v1.x, v2.x);
