@@ -37,8 +37,10 @@ function repaint(time) {
     context.arc(pos.x, pos.y, 5, 0, 2*Math.PI);
     context.stroke();
 
-    context.fillText("(" + model.mousePos.x + "," + model.mousePos.y + ")",
-		     pos.x, pos.y)
+    context.fillText("(" + model.mousePos.x.toFixed(2) +
+                     "," + model.mousePos.y.toFixed(2) +
+                     ")",
+		     pos.x + 10, pos.y)
   }
 
   window.requestAnimationFrame(repaint);
