@@ -1,9 +1,10 @@
-define(["numbers/vec2"],
-function(Vec2) {
+define(["numbers/vec2", "geometry"],
+function(Vec2,           Geom) {
 
 return function Model (F) {
 
   var V = Vec2(F);
+  var G = Geom(V);
 
   this.F = F;
   this.V = V;
@@ -34,11 +35,26 @@ return function Model (F) {
   };
 
   /****************************************************************************/
+
+  this.selection = -1;
+
+  /****************************************************************************/
   function Tan(coords) {
     /* these points are sorted counter-clockwise */
     this.coords = coords;
   }
-  
+
+  Tan.prototype.contains = function contains(pt) {
+    /*
+    var cmp = G.compareSlopeFrom(pt);
+
+    for (var i in this.coords)
+      if (cmp(this.coords[i], this.coords[(i + 1) % this.coords.length])
+    */
+  };
+
+  /****************************************************************************/
+
   /* shapes */
   var shapes = [
     [[0,2], [0,1], [0,0], [1,0], [2,0], [1,1]], /* big triangle    */
