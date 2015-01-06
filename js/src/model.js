@@ -9,31 +9,7 @@ return function Model (F) {
   this.F = F;
   this.V = V;
 
-  var itof = F.fromInt;
-  var atov = function atov(a) { return new V.Vector(itof(a[0]), itof(a[1])); };
   
-  /****************************************************************************/
-
-  // TODO: maybe this stuff should go in view?
-
-  this.mousePos = null;
-  this.scale    = F.one;
-  this.offset   = V.zero;
-
-  this.toVec = function toVec (x,y) {
-    return V.smult(this.scale, V.minus(atov([x,y]), this.offset));
-  };
-
-  this.fromVec = function fromVec (v) {
-    var trans = V.plus(this.offset, V.sdiv(v, this.scale));
-    return {x: F.toNumber(trans.x), y: F.toNumber(trans.y)};
-  };
-
-  this.setSize = function setSize (w, h) {
-    this.scale  = F.div(itof(6), Math.min(w, h));
-    this.offset = V.sdiv(new V.Vector(w, h), itof(2));
-  };
-
   /****************************************************************************/
 
   this.selection = -1;
@@ -45,7 +21,8 @@ return function Model (F) {
   }
 
   Tan.prototype.contains = function contains(pt) {
-    /*
+    return true;
+    /* TODO
     var cmp = G.compareSlopeFrom(pt);
 
     for (var i in this.coords)
@@ -81,10 +58,10 @@ return function Model (F) {
   
   for (var i in shapes) {
     var coords = [];
-    var offset = V.sdiv(atov(offsets[i]), itof(4));
+    var offset = V.sdiv(V.fromPair(offsets[i]), F.fromInt(4));
   
     for (var p in shapes[i]) {
-      var coord = atov(shapes[i][p]);
+      var coord = V.fromPair(shapes[i][p]);
       coords.push(V.plus(coord, offset));
     }
 

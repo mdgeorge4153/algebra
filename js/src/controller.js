@@ -1,31 +1,19 @@
 define(["lib/domReady!"],
 function(doc) {
-return function Controller(model) {
+return function Controller(model, view) {
 
-var canvas = doc.getElementById("canvas");
+function onMouseMove(e) {
+  var pos = view.getEventCoords(e);
 
-function resize() {
-  canvas.width  = window.innerWidth  - 1;
-  canvas.height = window.innerHeight - 1;
-
-  model.setSize(canvas.width, canvas.height);
+  for (var i in model.tans)
+    if (model.tans[i].contains(pos))
+      model.selected = i;
 }
 
-window.addEventListener("resize", resize);
-resize();
+view.canvas.addEventListener("mousemove",  onMouseMove);
+view.canvas.addEventListener("mouseenter", onMouseMove);
+view.canvas.addEventListener("mouseout",   onMouseMove);
 
-function mousemove(e) {
-  var rect = canvas.getBoundingClientRect();
-  model.mousePos = model.toVec(e.clientX - rect.left,
-                               e.clientY - rect.top);
-}
+};
 
-canvas.addEventListener("mousemove", mousemove);
-
-function mouseout(e) {
-  model.mousePos = null;
-}
-canvas.addEventListener("mouseout", mouseout);
-
-}
 });
