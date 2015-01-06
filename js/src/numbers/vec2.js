@@ -1,5 +1,5 @@
-define(["algebra", "util"],
-function(algebra,   Util) {
+define(["algebra", "util", "interface"],
+function(algebra,   Util,   Interface) {
 
 function Vec2(field) {
 
@@ -21,25 +21,25 @@ function Vec2(field) {
     return field.equals(v1.x, v2.x) && field.equals(v1.y, v2.y);
   };
 
-  V.zero = new Vector(field.zero, field.zero);
+  V.zero = new V.Vector(field.zero, field.zero);
   Object.freeze(V.zero);
 
   V.plus = function plus(v1, v2) {
-    return new Vector(field.plus(v1.x, v2.x), field.plus(v1.y, v2.y));
+    return new V.Vector(field.plus(v1.x, v2.x), field.plus(v1.y, v2.y));
   };
 
   V.neg = function neg (v) {
-    return new Vector(field.neg(v.x), field.neg(v.y));
+    return new V.Vector(field.neg(v.x), field.neg(v.y));
   };
 
   V.smult = function smult(s, v) {
-    return new Vector(field.times(s, v.x), field.times(s, v.y));
+    return new V.Vector(field.times(s, v.x), field.times(s, v.y));
   };
 
   if (Interface.isImplementation(field, algebra.Field))
-    algebra.VectorSpace.instantiate(V);
+    algebra.VectorSpaceOver(field).instantiate(V);
   else
-    algebra.Module.instantiate(V);
+    algebra.ModuleOver(field).instantiate(V);
 
   /****************************************************************************/
 
@@ -48,7 +48,7 @@ function Vec2(field) {
   };
 
   V.perp = function perp (v) {
-    return new Vector(field.neg(v.y), v.x);
+    return new V.Vector(field.neg(v.y), v.x);
   };
 
   V.cross = function cross (v1, v2) {
