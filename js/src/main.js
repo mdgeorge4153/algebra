@@ -10,7 +10,7 @@ function( floats,           Model,   View,   Controller ) {
 
 var model = new Model(floats);
 var view  = new View(model);
-// var contr = new Controller(model);
+var contr = new Controller(model);
 
 });
 

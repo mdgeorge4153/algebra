@@ -10,12 +10,41 @@ var context = canvas.getContext("2d");
 
 function repaint(time) {
 
-  context.clearRect(0, 0, 200, 200);
+  context.clearRect(0, 0, canvas.width, canvas.height);
 
   context.beginPath();
   context.moveTo(100, 100);
   context.lineTo(100 + 100 * Math.cos(time/1000), 100 + 100 * Math.sin(time/1000));
   context.stroke();
+
+  if (model.mousePos !== null) {
+    context.beginPath();
+    var pos = model.fromVec(model.mousePos);
+    context.arc(pos.x, pos.y, 5, 0, 2*Math.PI);
+    context.stroke();
+
+    context.fillText("(" + model.mousePos.x + "," + model.mousePos.y + ")",
+                     pos.x, pos.y)
+  }
+
+  context.save();
+  for (var i in model.tans) {
+    context.beginPath();
+
+    context.fillStyle = "blue";
+    context.strokeStyle = "black";
+    context.lineWidth   = 1;
+
+    for (var j in model.tans[i].coords) {
+      var pt = model.fromVec(model.tans[i].coords[j]);
+      context.lineTo(pt.x, pt.y);
+    }
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+  }
+  context.restore();
 
   window.requestAnimationFrame(repaint);
 }

@@ -7,7 +7,33 @@ return function Model (F) {
 
   this.F = F;
   this.V = V;
+
+  var itof = F.fromInt;
+  var atov = function atov(a) { return new V.Vector(itof(a[0]), itof(a[1])); };
   
+  /****************************************************************************/
+
+  // TODO: maybe this stuff should go in view?
+
+  this.mousePos = null;
+  this.scale    = F.one;
+  this.offset   = V.zero;
+
+  this.toVec = function toVec (x,y) {
+    return V.smult(this.scale, V.minus(atov([x,y]), this.offset));
+  };
+
+  this.fromVec = function fromVec (v) {
+    var trans = V.plus(this.offset, V.sdiv(v, this.scale));
+    return {x: F.toNumber(trans.x), y: F.toNumber(trans.y)};
+  };
+
+  this.setSize = function setSize (w, h) {
+    this.scale  = F.div(itof(6), Math.min(w, h));
+    this.offset = V.sdiv(new V.Vector(w, h), itof(2));
+  };
+
+  /****************************************************************************/
   function Tan(coords) {
     /* these points are sorted counter-clockwise */
     this.coords = coords;
@@ -26,19 +52,16 @@ return function Model (F) {
   
   /* offsets in quarter units */
   var offsets = [
-    [2,  2], /* big triangle    */
-    [2,  4], /* big triangle    */
-    [11, 3], /* medium triangle */
-    [12, 8], /* small triangle  */
-    [13, 3], /* parallelogram   */
-    [18, 2], /* small triangle  */
-    [17, 8]  /* square          */
+    [-10, -4], /* big triangle    */
+    [-10, -2], /* big triangle    */
+    [ -1, -3], /* medium triangle */
+    [  0,  2], /* small triangle  */
+    [  1, -3], /* parallelogram   */
+    [  6, -4], /* small triangle  */
+    [  5,  2]  /* square          */
   ];
   
   this.tans = [];
-  
-  var itof = F.fromInt;
-  var atov = function atov(a) { return new V.Vector(itof(a[0]), itof(a[1])); };
   
   for (var i in shapes) {
     var coords = [];
@@ -48,12 +71,10 @@ return function Model (F) {
       var coord = atov(shapes[i][p]);
       coords.push(V.plus(coord, offset));
     }
-  
+
     this.tans.push(new Tan(coords));
   }
 
-  this.dragging = false;
-  this.hover    = -1;
 };
 
 });
