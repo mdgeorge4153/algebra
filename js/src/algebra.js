@@ -145,24 +145,25 @@ OrderedRing.addDefaultOperation("le", [E, E, Interface.bool],
 );
 
 OrderedRing.addDefaultOperation("lt", [E, E, Interface.bool],
-  function lt (a, b) { throw "TODO"; }
+  function lt (a, b) { return !this.ge(a, b); }
 );
 
 OrderedRing.addDefaultOperation("ge", [E, E, Interface.bool],
-  function ge (a, b) { throw "TODO"; }
+  function ge (a, b) { return this.le(b, a); }
 );
 
 OrderedRing.addDefaultOperation("gt", [E, E, Interface.bool],
-  function gt (a, b) { throw "TODO"; }
+  function gt (a, b) { return !this.le(a,b); }
 );
 
 OrderedRing.addDefaultOperation("cmp", [E, E, Interface.integer],
-  function cmp (a, b) { throw "TODO"; }
+  function cmp (a, b) { return this.eq(a, b) ? 0  :
+                               this.le(a, b) ? -1 : 1; }
 );
 
 /* TODO: sign more useful if it returns E or integer? */
 OrderedRing.addDefaultOperation("sign", [E, Interface.integer],
-  function sign (a, b) { throw "TODO"; }
+  function sign (a) { return this.cmp(a,this.zero); }
 );
 
 Object.freeze(OrderedRing);
