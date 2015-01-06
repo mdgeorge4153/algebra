@@ -1,5 +1,7 @@
 /* TODO */
 define(["interface"], {
+/* Set.requires(isElem, isTrue); */
+isTrue:           undefined,
 /* Set.requires(equals, isReflexive); */
 isReflexive:      undefined,
 /* Set.requires(equals, isTransitive); */
