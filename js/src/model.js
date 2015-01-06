@@ -1,26 +1,60 @@
+define(["numbers/vec2"],
+function(Vec2) {
 
-function(field) {
+return function Model (F) {
 
-function Point(x, y) {
-  this.x = x;
-  this.y = y;
-}
+  var V = Vec2(F);
 
-function Tan(coords) {
-  this.coords = coords;
-}
-
-Tan.prototype.contains = function (x, y) {
+  this.F = F;
+  this.V = V;
   
-};
-
-Tan.prototype.draw = function () {
-};
-
-function Tangrams() {
+  function Tan(coords) {
+    /* these points are sorted counter-clockwise */
+    this.coords = coords;
+  }
+  
+  /* shapes */
+  var shapes = [
+    [[0,2], [0,1], [0,0], [1,0], [2,0], [1,1]], /* big triangle    */
+    [[0,2], [1,1], [2,0], [2,1], [2,2], [1,2]], /* big triangle    */
+    [[0,2], [0,1], [0,0], [1,1]],               /* medium triangle */
+    [[1,1], [0,1], [1,0]],                      /* small triangle  */
+    [[0,0], [1,0], [2,1], [1,1]],               /* parallelogram   */
+    [[1,1], [0,0], [1,0]],                      /* small triangle  */
+    [[0,1], [0,0], [1,0], [1,1]]                /* square          */
+  ];
+  
+  /* offsets in quarter units */
+  var offsets = [
+    [2,  2], /* big triangle    */
+    [2,  4], /* big triangle    */
+    [11, 3], /* medium triangle */
+    [12, 8], /* small triangle  */
+    [13, 3], /* parallelogram   */
+    [18, 2], /* small triangle  */
+    [17, 8]  /* square          */
+  ];
+  
   this.tans = [];
-}
+  
+  var itof = F.fromInt;
+  var atov = function atov(a) { return new V.Vector(itof(a[0]), itof(a[1])); };
+  
+  for (var i in shapes) {
+    var coords = [];
+    var offset = V.sdiv(atov(offsets[i]), itof(4));
+  
+    for (var p in shapes[i]) {
+      var coord = atov(shapes[i][p]);
+      coords.push(V.plus(coord, offset));
+    }
+  
+    this.tans.push(new Tan(coords));
+  }
 
-}
+  this.dragging = false;
+  this.hover    = -1;
+};
 
+});
 

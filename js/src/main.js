@@ -5,9 +5,12 @@ requirejs.config({
   }
 });
 
-require(["html", "lib/domReady!", "numbers/floats"],
-function( html,   doc,             floats ) {
+require(["numbers/floats", "model", "view", "controller"],
+function( floats,           Model,   View,   Controller ) {
 
-doc.body.appendChild(html.example());
+var model = new Model(floats);
+var view  = new View(model);
+// var contr = new Controller(model);
 
 });
+
