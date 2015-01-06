@@ -5,8 +5,8 @@ return function Controller(model) {
 var canvas = doc.getElementById("canvas");
 
 function resize() {
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width  = window.innerWidth  - 1;
+  canvas.height = window.innerHeight - 1;
 
   model.setSize(canvas.width, canvas.height);
 }
