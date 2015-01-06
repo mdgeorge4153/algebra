@@ -174,6 +174,8 @@ var OrderedField = new Interface();
 OrderedField.isA(OrderedRing);
 OrderedField.isA(Field);
 
+OrderedField.hasOperation("toNumber", [E, Interface.number]);
+
 Object.freeze(OrderedField);
 exports.OrderedField = OrderedField;
 
@@ -187,9 +189,13 @@ function ModuleOver(r) {
 
   Module.hasOperation("smult", [S, E, E]);
 
-  Module.requires(r,     isA, Ring);
-  Module.requires(times, distributesOver, r.plus);
-  Module.requires(times, associatesOver, r.times);
+  Module.requires(r,     props.isA, Ring);
+  Module.requires(times, props.distributesOver, r.plus);
+  Module.requires(times, props.associatesOver, r.times);
+
+  Module.addDefaultOperation("sdiv", [E, S, E],
+    function (v, s) { return this.smult(r.inv(s), v); }
+  );
 
   Object.freeze(Module);
   return Module;
@@ -204,7 +210,7 @@ function VectorSpaceOver(f) {
 
   VectorSpace.isA(ModuleOver(f));
 
-  VectorSpace.requires(f, isA, Field);
+  VectorSpace.requires(f, props.isA, Field);
 
   Object.freeze(VectorSpace);
   return VectorSpace;
