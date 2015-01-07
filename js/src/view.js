@@ -32,7 +32,7 @@ function repaint(time) {
     for (var i in model.tans) {
       context.beginPath();
   
-      if (i === model.selection)
+      if (i === model.hover)
         context.fillStyle = "#8080FF";
       else
         context.fillStyle = "blue";
