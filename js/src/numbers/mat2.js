@@ -31,24 +31,24 @@ function Mat2(field) {
     return true;
   };
 
-  M.zero = new Matrix(field.zero, field.zero, field.zero, field.zero);
+  M.zero = new M.Matrix(field.zero, field.zero, field.zero, field.zero);
 
   M.plus = function plus(m1, m2) {
-    return new Matrix(
+    return new M.Matrix(
       field.plus(m1.xx, m2.xx), field.plus(m1.yx, m2.yx),
       field.plus(m1.xy, m2.xy), field.plus(m1.yy, m2.yy)
     );
   };
 
   M.neg = function neg (m) {
-    return new Matrix(
+    return new M.Matrix(
       field.neg(m.xx), field.neg(m.yx),
       field.neg(m.xy), field.neg(m.yy)
     );
   };
 
   M.times = function times(m1, m2) {
-    return new Matrix(
+    return new M.Matrix(
       field.plus(field.times(m1.xx, m2.xx), field.times(m1.yx, m2.xy)),
       field.plus(field.times(m1.xx, m2.yx), field.times(m1.yx, m2.yy)),
       field.plus(field.times(m1.xy, m2.xx), field.times(m1.yy, m2.xy)),
@@ -56,7 +56,7 @@ function Mat2(field) {
     );
   };
 
-  M.one = new Matrix(field.one, field.zero,
+  M.one = new M.Matrix(field.one, field.zero,
                      field.zero, field.one);
   Object.freeze(M.one);
 
@@ -67,7 +67,7 @@ function Mat2(field) {
   M.inv = function inv(m) {
     var invDet = field.inv(det(m));
 
-    return new Matrix(
+    return new M.Matrix(
       field.times(invDet, m.yy),
       field.times(invDet, field.neg(m.yx)),
       field.times(invDet, field.neg(m.xy)),
@@ -76,7 +76,7 @@ function Mat2(field) {
   };
 
   M.smult = function smult(s, m) {
-    return new Matrix(
+    return new M.Matrix(
       field.times(s, m.xx), field.times(s, m.yx),
       field.times(s, m.xy), field.times(s, m.yy)
     );
@@ -93,7 +93,7 @@ function Mat2(field) {
   };
 
   M.transpose = function (m) {
-    return new Matrix(m.xx, m.xy, m.yx, m.yy);
+    return new M.Matrix(m.xx, m.xy, m.yx, m.yy);
   };
 
   M.transform = function (m, v) {
@@ -104,11 +104,11 @@ function Mat2(field) {
   };
 
   M.rotation = function (cos, sin) {
-    return new Matrix(cos, field.neg(sin),
+    return new M.Matrix(cos, field.neg(sin),
                       sin, cos);
   };
 
-  algebra.VectorSpaceOver(f).instantiate(M);
+  algebra.VectorSpaceOver(field).instantiate(M);
   algebra.Ring.instantiate(M);
 
   return M;
