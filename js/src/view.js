@@ -10,15 +10,19 @@ function View (model, canvas) {
   this.context = canvas.getContext("2d");
 
   this.mousePos = null;
+  this.wheel    = null;
 
   this.scale    = this.F.one;
   this.offset   = this.V.zero;
+
 
   window.requestAnimationFrame(repaint.bind(this));
 
   canvas.addEventListener("mousemove",  mousemove.bind(this));
   canvas.addEventListener("mouseenter", mousemove.bind(this));
   canvas.addEventListener("mouseout",   mouseout.bind(this));
+
+  canvas.addEventListener("wheel",      mousewheel.bind(this));
 }
 
 /******************************************************************************/
@@ -46,24 +50,31 @@ function repaint(time) {
       context.closePath();
       context.fill();
       context.stroke();
-  
+
     }
     context.restore();
-  
+
     /* Draws the mouse for debugging purposes.
     if (mousePos !== null) {
       context.beginPath();
       var pos = fromVec(mousePos);
       context.arc(pos[0], pos[1], 5, 0, 2*Math.PI);
+
+      if (wheel !== null) {
+        var wPos = fromVec(V.plus(mousePos, wheel));
+        context.moveTo(pos[0], pos[1]);
+        context.lineTo(wPos[0], wPos[1]);
+      }
+
       context.stroke();
-  
+
       context.fillText("(" + mousePos.x.toFixed(2) +
                        "," + mousePos.x.toFixed(2) +
                        ")",
-  		     pos[0] + 20, pos[1] + 20)
+                       pos[0] + 20, pos[1] + 20)
     }
     */
-  
+
     window.requestAnimationFrame(repaint.bind(this));
   }
 };
@@ -76,6 +87,10 @@ function mousemove(e) {
 
 function mouseout(e) {
   this.mousePos = null;
+}
+
+function mousewheel(e) {
+  this.wheel = this.V.smult(this.scale, this.V.fromPair([e.deltaX, e.deltaY]));
 }
 
 /******************************************************************************/
