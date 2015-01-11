@@ -1,10 +1,11 @@
-define(["numbers/vec2", "geometry"],
-function(Vec2,           Geom) {
+define(["numbers/vec2", "geometry", "region"],
+function(Vec2,           Geom,       Region ) {
 
 return function Model (F) {
 
   var V = Vec2(F);
   var G = Geom(V);
+  var R = Region(V);
 
   this.F = F;
   this.V = V;
@@ -28,6 +29,11 @@ return function Model (F) {
 
     return true;
   };
+
+
+  /****************************************************************************/
+
+  this.goal = R.example1();
 
   /****************************************************************************/
 
@@ -66,7 +72,6 @@ return function Model (F) {
 
     this.tans.push(new Tan(coords));
   }
-
 };
 
 });
