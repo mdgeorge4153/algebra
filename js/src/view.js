@@ -15,8 +15,11 @@ function View (model, canvas) {
   this.scale    = this.F.one;
   this.offset   = this.V.zero;
 
-
-  window.requestAnimationFrame(repaint.bind(this));
+  var t = this;
+  window.requestAnimationFrame(function paint(time) {
+    t.repaint(time);
+    window.requestAnimationFrame(paint);
+  });
 
   canvas.addEventListener("mousemove",  mousemove.bind(this));
   canvas.addEventListener("mouseenter", mousemove.bind(this));
@@ -27,34 +30,14 @@ function View (model, canvas) {
 
 /******************************************************************************/
 
-function repaint(time) {
-  with(this) {
+View.prototype.repaint = function repaint(time) {
+  this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  this.drawMouse();
+};
 
-    context.clearRect(0, 0, canvas.width, canvas.height);
-  
-    context.save();
-    for (var i in model.tans) {
-      context.beginPath();
-  
-      if (i === model.hover)
-        context.fillStyle = "#8080FF";
-      else
-        context.fillStyle = "blue";
-      context.strokeStyle = "black";
-      context.lineWidth   = 1;
-  
-      for (var j in model.tans[i].coords) {
-        var pt = this.fromVec(model.tans[i].coords[j]);
-        context.lineTo(pt[0], pt[1]);
-      }
-      context.closePath();
-      context.fill();
-      context.stroke();
-
-    }
-    context.restore();
-
-    /* Draws the mouse for debugging purposes.
+View.prototype.drawMouse = function drawMouse() {
+  with (this) {
+    /* Draws the mouse for debugging purposes. */
     if (mousePos !== null) {
       context.beginPath();
       var pos = fromVec(mousePos);
@@ -73,9 +56,6 @@ function repaint(time) {
                        ")",
                        pos[0] + 20, pos[1] + 20)
     }
-    */
-
-    window.requestAnimationFrame(repaint.bind(this));
   }
 };
 

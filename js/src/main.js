@@ -9,11 +9,11 @@ requirejs.config({
   }
 });
 
-require(["numbers/floats", "model", "view", "controller", "lib/domReady!"],
-function( floats,           Model,   View,   Controller,   doc ) {
+require(["numbers/floats", "model", "tanView", "controller", "lib/domReady!"],
+function( floats,           Model,   TanView,   Controller,   doc ) {
 
 model = new Model(floats);
-view  = new View(model, doc.getElementById("canvas"));
+view  = new TanView(model, doc.getElementById("canvas"));
 contr = new Controller(model, view);
 
 function resize() {
