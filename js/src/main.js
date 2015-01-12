@@ -1,7 +1,10 @@
 var model;
+
 var tans;
+var contr;
+
 var goal;
-var controller;
+var gcontr;
 
 requirejs.config({
   baseUrl: "src",
@@ -11,14 +14,16 @@ requirejs.config({
   }
 });
 
-require(["numbers/floats", "model", "tanView", "goalView", "controller", "lib/domReady!"],
-function( floats,           Model,   TanView,   GoalView,   Controller,   doc) {
+require(["numbers/floats", "model", "tanView", "goalView", "controller", "goalController", "lib/domReady!"],
+function( floats,           Model,   TanView,   GoalView,   Controller,   GoalController,   doc) {
 
 model = new Model(floats);
 model.loadGoal("data/t");
 tans  = new TanView(model, doc.getElementById("canvas"));
 contr = new Controller(model, tans);
+
 goal  = new GoalView(model, doc.getElementById("goal"));
+gcont = new GoalController(model, goal);
 
 function resize() {
   tans.resize(0, 0, window.innerWidth - 1, window.innerHeight - 1);
