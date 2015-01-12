@@ -17,7 +17,7 @@ function typeEq(t1, t2) {
   if (t1.length !== t2.length)
     return false;
 
-  for (var i in t1)
+  for (var i = 0; i < t1.length; i++)
     if (t1[i] !== t2[i])
       return false;
 
@@ -25,8 +25,8 @@ function typeEq(t1, t2) {
 }
 
 Interface.prototype.isA = function(supertype) {
-  for (var name in supertype.types)
-    this.hasTypeParam(name);
+  for (var i = 0; i < supertype.types.length; i++)
+    this.hasTypeParam(supertype.types[i]);
 
   /* TODO: requirements */
 

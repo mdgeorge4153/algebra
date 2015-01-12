@@ -42,7 +42,7 @@ function mkNodeFunction (name) {
   return function () {
     result = document.createElement(name);
 
-    for (var i in arguments) {
+    for (var i = 0; i < arguments.length; i++) {
       var arg = arguments[i];
 
       if (arg instanceof Node)
@@ -62,7 +62,7 @@ function mkNodeFunction (name) {
   }
 }
 
-for (var i in tags)
+for (var i = 0; i < tags.length; i++)
   Html[tags[i]] = mkNodeFunction(tags[i].toLowerCase());
 
 return Html;

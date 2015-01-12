@@ -23,7 +23,7 @@ function onMouseMove(e) {
   if (selection === null) {
     model.hover = -1;
 
-    for (var i in model.tans)
+    for (var i = 0; i < model.tans.length; i++)
       if (model.tans[i].contains(pos))
         model.hover = i;
   } else {

@@ -61,6 +61,11 @@ R.example1 = function example1() {
 };
 
 
+R.load = function load(file) {
+  require(["lib/text!" + file]);
+  return JSON.parse(require("lib/text!" + file));
+}
+
 return R;
 
 }
