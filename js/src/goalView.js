@@ -3,6 +3,20 @@ function(View) {
 
 function GoalView(model, canvas) {
   View.call(this, model, canvas);
+
+  var V = model.V;
+  var F = model.F;
+
+  var leftArrow  = [[-15, 0], [-13, 4], [-14, 0], [-13, -4]]
+  leftArrow = leftArrow.map(V.fromPair.bind(V));
+  leftArrow = leftArrow.map(V.smult.bind(V, F.inv(F.fromInt(4))));
+
+  var rightArrow = leftArrow.map(function (v) {
+    return new V.Vector(F.neg(v.x), v.y);
+  });
+
+  this.leftArrow  = leftArrow;
+  this.rightArrow = rightArrow;
 }
 
 GoalView.prototype             = Object.create(View.prototype);
@@ -10,29 +24,26 @@ GoalView.prototype.constructor = GoalView;
 
 GoalView.prototype.repaint = function repaint(time) {
   with(this) {
-    var g = model.goal;
+    context.save();
 
+    /* clear */
     context.fillStyle = "white";
     context.fillRect(0, 0, canvas.width, canvas.height);
+
+    /* border */
+    context.strokeStyle = "black";
     context.beginPath();
-
-    for (var i = 0; i < g.length; i++) {
-      var v   = g[i];
-      var pos = this.fromVec(v.pos);
-
-      if (v.isolated)
-        context.arc(pos[0], pos[1], 3, 0, 2*Math.PI);
-      else for (var j in v.edges) {
-        var e   = v.edges[j];
-        var dst = this.fromVec(g[e.dst].pos);
-        context.moveTo(pos[0], pos[1]);
-        context.lineTo(dst[0], dst[1]);
-      }
-    }
-
+    context.rect(0,0,canvas.width, canvas.height);
     context.stroke();
 
-    var leftHover  = false;
+    /* goal */
+
+    this.drawRegion(model.goal);
+    context.strokeStyle = "blue";
+    context.stroke();
+
+    /* left and right arrows */
+    var  leftHover = false;
     var rightHover = false;
 
     if (mousePos === null)
@@ -42,14 +53,29 @@ GoalView.prototype.repaint = function repaint(time) {
     else
       leftHover = true;
 
-    /* draw left and right arrows */
+    this.drawPoly(this.leftArrow);
+    if (leftHover)
+      context.fillStyle   = "#404040";
+    else
+      context.fillStyle   = "#C0C0C0";
+    context.fill();
+
+    this.drawPoly(this.rightArrow);
+    if (rightHover)
+      context.fillStyle   = "#404040";
+    else
+      context.fillStyle   = "#C0C0C0";
+    context.fill();
+
+    context.restore();
+    this.drawMouse();
   };
 }
 
 GoalView.prototype.resize = function resize(t, l, w, h) {
   View.prototype.resize.call(this, t, l, w, h);
 
-  this.canvas.style.border = "1px solid black";
+  // this.canvas.style.border = "8px solid black";
 }
 
 return GoalView;

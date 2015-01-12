@@ -35,6 +35,32 @@ View.prototype.repaint = function repaint(time) {
   this.drawMouse();
 };
 
+View.prototype.drawPoly = function drawPoly(coords) {
+  this.context.beginPath();
+  for (var i = 0; i < coords.length; i++) {
+    var pt = this.fromVec(coords[i]);
+    this.context.lineTo(pt[0], pt[1]);
+  }
+  this.context.closePath();
+};
+
+View.prototype.drawRegion = function drawRegion(region) {
+  this.context.beginPath();
+  for (var i = 0; i < region.length; i++) {
+    var v   = region[i];
+    var pos = this.fromVec(v.pos);
+  
+    if (v.isolated)
+      this.context.arc(pos[0], pos[1], 2, 0, 2*Math.PI);
+    else for (var j = 0; j < v.edges.length; j++) {
+      var e   = v.edges[j];
+      var dst = this.fromVec(region[e.dst].pos);
+      this.context.moveTo(pos[0], pos[1]);
+      this.context.lineTo(dst[0], dst[1]);
+    }
+  }
+};
+
 View.prototype.drawMouse = function drawMouse() {
   with (this) {
     /* Draws the mouse for debugging purposes. */
@@ -52,7 +78,7 @@ View.prototype.drawMouse = function drawMouse() {
       context.stroke();
 
       context.fillText("(" + mousePos.x.toFixed(2) +
-                       "," + mousePos.x.toFixed(2) +
+                       "," + mousePos.y.toFixed(2) +
                        ")",
                        pos[0] + 20, pos[1] + 20)
     }
@@ -67,6 +93,7 @@ function mousemove(e) {
 
 function mouseout(e) {
   this.mousePos = null;
+  this.wheel    = null;
 }
 
 function mousewheel(e) {
@@ -94,7 +121,6 @@ View.prototype.resize = function resize (t, l, w, h) {
     canvas.height       = h;
     canvas.style.top    = t + "px";
     canvas.style.left   = l + "px";
-    canvas.style.border = "2px solid black";
 
     scale  = F.div(F.fromInt(6), F.fromInt(Math.min(w, h)));
     offset = V.sdiv(new V.Vector(w, h), F.fromInt(2));
@@ -103,7 +129,8 @@ View.prototype.resize = function resize (t, l, w, h) {
 
 View.prototype.getEventCoords = function getEventCoords(e) {
   var rect = this.canvas.getBoundingClientRect();
-  return this.toVec(e.clientX - rect.left - 2, e.clientY - rect.top - 2);
+  // var bord = {x: 
+  return this.toVec(e.clientX - rect.left, e.clientY - rect.top);
 };
 
 /******************************************************************************/

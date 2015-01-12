@@ -14,26 +14,24 @@ TanView.prototype.repaint = function repaint(time) {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     context.save();
-    for (var i in model.tans) {
-      context.beginPath();
 
+    for (var i = 0; i < model.tans.length; i++) {
       if (i === model.hover)
         context.fillStyle = "#8080FF";
       else
         context.fillStyle = "blue";
+
       context.strokeStyle = "black";
       context.lineWidth   = 1;
-  
-      for (var j in model.tans[i].coords) {
-        var pt = this.fromVec(model.tans[i].coords[j]);
-        context.lineTo(pt[0], pt[1]);
-      }
-      context.closePath();
+
+      this.drawPoly(model.tans[i].coords);
+
       context.fill();
       context.stroke();
-
     }
     context.restore();
+
+    this.drawMouse();
   }
 };
 

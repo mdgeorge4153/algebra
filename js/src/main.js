@@ -6,7 +6,8 @@ var controller;
 requirejs.config({
   baseUrl: "src",
   paths: {
-    "lib": "../lib"
+    "lib":  "../lib",
+    "data": "../pictures"
   }
 });
 
@@ -20,7 +21,7 @@ goal  = new GoalView(model, doc.getElementById("goal"));
 
 function resize() {
   tans.resize(0, 0, window.innerWidth - 1, window.innerHeight - 1);
-  goal.resize(30, window.innerWidth - 230, 200, 300);
+  goal.resize(10, window.innerWidth - 100, 90, 60);
 }
 
 window.addEventListener("resize", resize);
