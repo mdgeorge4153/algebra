@@ -2,7 +2,7 @@ define([],
 function() {
 return function GoalController(model, view) {
 
-var puzzles = ["t", "box"];
+var puzzles = ["t", "box", "bird"];
 var i = 0;
 
 function onMouseDown(e) {
