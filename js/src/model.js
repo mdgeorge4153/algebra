@@ -1,5 +1,5 @@
 define(["numbers/vec2", "geometry", "region"],
-function(Vec2,           Geom,       Region ) {
+function(Vec2,           Geom,       Region) {
 
 return function Model (F) {
 
@@ -61,11 +61,11 @@ return function Model (F) {
   
   this.tans = [];
   
-  for (var i in shapes) {
+  for (var i = 0; i < shapes.length; i++) {
     var coords = [];
     var offset = V.sdiv(V.fromPair(offsets[i]), F.fromInt(4));
   
-    for (var p in shapes[i]) {
+    for (var p = 0; p < shapes[i].length; p++) {
       var coord = V.fromPair(shapes[i][p]);
       coords.push(V.plus(coord, offset));
     }
