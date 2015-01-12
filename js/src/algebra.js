@@ -11,6 +11,11 @@ var E      = Set.hasTypeParam("E");
 var equals = Set.hasOperation("equals", [E, E, Interface.bool]);
 var isElem = Set.hasOperation("isElem", [E, Interface.bool]);
 
+var stringOf = Set.hasOperation("stringOf", [E, Interface.string]);
+var ofString = Set.hasOperation("ofString", [Interface.string, E]);
+
+/* TODO: specs on ofString/stringOf */
+
 Set.requires(isElem, isTrue);
 
 Set.requires(equals, isReflexive);

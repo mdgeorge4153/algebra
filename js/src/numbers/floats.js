@@ -16,6 +16,8 @@ floats.times     = function (a,b) { return a * b;  };
 floats.inv       = function (a)   { return 1 / a;  };
 floats.isNonNeg  = function (a)   { return a >= 0; };
 floats.toNumber  = function (a)   { return a;      };
+floats.stringOf  = function (a)   { return a.toString(); };
+floats.ofString  = parseFloat;
 
 /* optimizations */
 floats.ne        = function (a,b) { return a != b; };
