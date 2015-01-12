@@ -1,5 +1,5 @@
-define(["lib/domReady!", "numbers/mat2"],
-function(doc,             Mat2) {
+define(["numbers/mat2"],
+function(Mat2) {
 return function Controller(model, view, cos, sin) {
 
 /** selection is either null (in which case we are not dragging) or it is a
