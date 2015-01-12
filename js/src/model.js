@@ -40,9 +40,25 @@ return function Model (F) {
     // the given file.  Once loaded, it transforms all of the pairs of strings
     // into vectors using V.fromPair and F.ofString, and updates the goal.
     require([name], function (data) {
-      this.goal = data.map(function (a) {
+      var points = data.map(function (a) {
         return V.fromPair(a.map(F.ofString.bind(F)));
       });
+
+      // normalize the goal so that the center of the bounding box is at (0,0)
+
+      var minX = points[0].x, minY = points[0].y,
+          maxX = points[0].x, maxY = points[0].y;
+      for (var i = 0; i < points.length; i++) {
+        minX = F.min(minX, points[i].x); minY = F.min(minY, points[i].y);
+        maxX = F.max(maxX, points[i].x); maxY = F.max(maxY, points[i].y);
+      }
+
+      var min = new V.Vector(minX, minY), max = new V.Vector(maxX, maxY);
+
+      var center = V.sdiv(V.plus(min, max), F.fromInt(2));
+      var offset = V.neg(center);
+
+      this.goal = points.map(V.plus.bind(V, offset));
     }.bind(this));
   };
 
