@@ -35,12 +35,15 @@ return function Model (F) {
 
   this.goal = null;
 
-  this.setGoal = function setGoal(g) {
-    this.goal = g;
-  };
-
   this.loadGoal = function loadGoal(name) {
-    require([name], this.setGoal.bind(this));
+    // Note: functional programming is ugly in JS.  This uses "require" to load
+    // the given file.  Once loaded, it transforms all of the pairs of strings
+    // into vectors using V.fromPair and F.ofString, and updates the goal.
+    require([name], function (data) {
+      this.goal = data.map(function (a) {
+        return V.fromPair(a.map(F.ofString.bind(F)));
+      });
+    }.bind(this));
   };
 
   /****************************************************************************/

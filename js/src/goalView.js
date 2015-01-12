@@ -39,9 +39,9 @@ GoalView.prototype.repaint = function repaint(time) {
     /* goal */
 
     if (model.goal !== null) {
-      this.drawRegion(model.goal);
-      context.strokeStyle = "blue";
-      context.stroke();
+      this.drawPoly(model.goal);
+      context.fillStyle = "blue";
+      context.fill();
     }
 
     /* left and right arrows */
