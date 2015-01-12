@@ -19,8 +19,16 @@ if (cos === undefined || sin === undefined) {
 var rotCCW = M.rotation(cos, sin);
 var rotCW  = M.rotation(cos, F.neg(sin));
 
+var oldPos = V.zero;
+
 function onMouseMove(e) {
   var pos = view.getEventCoords(e);
+
+  // we filter out motions that don't change the position so that
+  // using the scroll wheel works more smoothly.
+  if (V.equals(pos, oldPos))
+    return;
+  oldPos = pos;
 
   if (selection === null) {
     model.hover = -1;
