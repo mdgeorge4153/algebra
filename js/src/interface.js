@@ -46,7 +46,7 @@ Interface.prototype.hasTypeParam = function(name) {
 };
 
 Interface.prototype.hasOperation = function(name, type) {
-  if (!(name in this.operations))
+  if (!this.operations.hasOwnProperty(name))
     this.operations[name] = type;
 
   else if (typeEq(type, this.operations[name]))
@@ -59,7 +59,7 @@ Interface.prototype.hasOperation = function(name, type) {
 };
 
 Interface.prototype.hasProperty = function(name, type) {
-  if (!(name in this.properties))
+  if (!this.properties.hasOwnProperty(name))
     this.properties[name] = type;
   else if (this.properties[name] === type)
     {} /* do nothing */
@@ -76,7 +76,7 @@ Interface.prototype.requires = function(operation, property, args) {
 Interface.prototype.addDefaultOperation = function(name, type, impl) {
   this.hasOperation(name, type);
 
-  if (!(name in this.defaults))
+  if (!this.defaults.hasOwnProperty(name))
     this.defaults[name] = impl;
 
   else if (this.defaults[name] === impl)
@@ -99,7 +99,7 @@ Interface.prototype.instantiate = function (impl) {
     if (!(method in impl))
       impl[method] = this.defaults[method];
 
-  if (!("interfaces" in impl))
+  if (!impl.hasOwnProperty("interfaces"))
     impl.interfaces = [];
 
   impl.interfaces.push(this);
