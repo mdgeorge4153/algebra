@@ -7,14 +7,15 @@ requirejs.config({
   baseUrl: "src",
   paths: {
     "lib":  "../lib",
-    "data": "../pictures"
+    "data": "../data"
   }
 });
 
 require(["numbers/floats", "model", "tanView", "goalView", "controller", "lib/domReady!"],
-function( floats,           Model,   TanView,   GoalView,   Controller,   doc ) {
+function( floats,           Model,   TanView,   GoalView,   Controller,   doc) {
 
 model = new Model(floats);
+model.loadGoal("data/t");
 tans  = new TanView(model, doc.getElementById("canvas"));
 contr = new Controller(model, tans);
 goal  = new GoalView(model, doc.getElementById("goal"));

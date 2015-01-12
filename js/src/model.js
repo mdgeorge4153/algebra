@@ -33,7 +33,15 @@ return function Model (F) {
 
   /****************************************************************************/
 
-  this.goal = R.example1();
+  this.goal = null;
+
+  this.setGoal = function setGoal(g) {
+    this.goal = g;
+  };
+
+  this.loadGoal = function loadGoal(name) {
+    require([name], this.setGoal.bind(this));
+  };
 
   /****************************************************************************/
 
