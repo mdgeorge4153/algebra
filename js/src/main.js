@@ -20,7 +20,7 @@ function( floats,           Model,   TanView,   GoalView,   Controller,   GoalCo
 model = new Model(floats);
 model.loadGoal("data/t");
 tans  = new TanView(model, doc.getElementById("canvas"));
-contr = new Controller(model, tans);
+contr = new Controller(model, tans, Math.cos(Math.PI/12), Math.sin(Math.PI/12));
 
 goal  = new GoalView(model, doc.getElementById("goal"));
 gcont = new GoalController(model, goal);

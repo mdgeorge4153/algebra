@@ -1,5 +1,5 @@
-define(["numbers/mat2"],
-function(Mat2) {
+define(["numbers/mat2", "geometry"],
+function(Mat2,           Geom) {
 return function Controller(model, view, cos, sin) {
 
 /** selection is either null (in which case we are not dragging) or it is a
@@ -9,13 +9,15 @@ var selection = null;
 var F = model.F;
 var V = model.V;
 var M = Mat2(F);
+var G = Geom(V);
 
 if (cos === undefined || sin === undefined) {
   cos = F.zero;
   sin = F.one;
 }
 
-var rotation = M.rotation(cos, sin);
+var rotCCW = M.rotation(cos, sin);
+var rotCW  = M.rotation(cos, F.neg(sin));
 
 function onMouseMove(e) {
   var pos = view.getEventCoords(e);
@@ -55,10 +57,22 @@ function onWheel(e) {
   if (model.hover === -1)
     return;
 
-  var tan    = model.tans[model.hover].coords;
-  var center = V.sdiv(tan.reduce(V.plus.bind(V)), F.fromInt(tan.length));
+  var tan     = model.tans[model.hover].coords;
+  var center  = V.sdiv(tan.reduce(V.plus.bind(V)), F.fromInt(tan.length));
+
+  var coords = tan.map(V.plus.bind(V, V.neg(center)));
 
   var pos    = view.getEventCoords(e);
+  var dir    = V.fromPair([e.deltaX, e.deltaY]);
+
+  var rot    = G.cmpSlopeFrom(center)(pos, V.plus(pos, dir));
+
+  if (rot === 1)
+    coords = coords.map(M.transform.bind(M, rotCW));
+  else if (rot === -1)
+    coords = coords.map(M.transform.bind(M, rotCCW));
+
+  model.tans[model.hover].coords = coords.map(V.plus.bind(V, center));
 }
 
 
