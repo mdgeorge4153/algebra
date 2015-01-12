@@ -171,6 +171,14 @@ OrderedRing.addDefaultOperation("sign", [E, Interface.integer],
   function sign (a) { return this.cmp(a,this.zero); }
 );
 
+OrderedRing.addDefaultOperation("min", [E, E, E],
+  function min (a,b) { return this.le(a,b) ? a : b; }
+);
+
+OrderedRing.addDefaultOperation("max", [E, E, E],
+  function max (a,b) { return this.le(a,b) ? b : a; }
+);
+
 Object.freeze(OrderedRing);
 exports.OrderedRing = OrderedRing;
 
