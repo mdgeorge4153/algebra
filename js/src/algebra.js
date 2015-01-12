@@ -168,7 +168,11 @@ OrderedRing.addDefaultOperation("cmp", [E, E, Interface.integer],
 
 /* TODO: sign more useful if it returns E or integer? */
 OrderedRing.addDefaultOperation("sign", [E, Interface.integer],
-  function sign (a) { return this.cmp(a,this.zero); }
+  function sign (a) {
+    var cmp = this.cmp(a,this.zero);
+    return cmp === 0 ? 0 :
+           cmp >   0 ? 1 : -1
+  }
 );
 
 OrderedRing.addDefaultOperation("min", [E, E, E],
