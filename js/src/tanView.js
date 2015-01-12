@@ -31,7 +31,7 @@ TanView.prototype.repaint = function repaint(time) {
     }
     context.restore();
 
-    this.drawMouse();
+    // this.drawMouse();
   }
 };
 

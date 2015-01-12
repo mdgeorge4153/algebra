@@ -70,7 +70,7 @@ GoalView.prototype.repaint = function repaint(time) {
     context.fill();
 
     context.restore();
-    this.drawMouse();
+    // this.drawMouse();
   };
 }
 
