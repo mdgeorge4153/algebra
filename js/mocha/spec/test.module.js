@@ -1,5 +1,12 @@
-define(["SampleModule"], function(SampleModule) {
+define(["SampleModule", "lib/jsverify"],
+function(SampleModule, jsc) {
   describe("Sample Module", function() {
+    // note: jsverify is trying to access "process", which seems to be defined
+    // incorrectly by someone or other.
+    process.argv=[];
+
+    jsc.property("identity", "nat", function(i) { return true; });
+
     it('should have a name', function() {
       expect(SampleModule.name).to.be.a("string");
       expect(SampleModule.name).to.equal("sample");
