@@ -1,11 +1,20 @@
-require("amd-loader");
+require.config(
+  {
+    baseUrl:'src/',
+    paths:{
+      'lib':'../lib',
+      'spec':'../spec'
+    }
+  }
+);
 
-var jsc      = require("jsverify");
-var algebra  = require("src/algebra");
-var integers = require("numbers/integers");
+require(['require', 'lib/mocha'], function(require){
+  mocha.setup('bdd');
+  require(['spec/numbers'], function(module){
+    // note: jsverify is trying to access "process", which seems to be defined
+    // incorrectly by someone or other.
+    process.argv=[];
 
-describe('Integers are an abelian group', function() {
-  abelianGroupProperties(Integers, {"e":jsc.integer});
+    mocha.run();
+  });
 });
-
-
