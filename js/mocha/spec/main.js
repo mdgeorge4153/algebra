@@ -10,9 +10,10 @@ require.config(
 
 require(['require', 'lib/chai', 'lib/mocha'], function(require){
 	mocha.setup('bdd');
-	// require(['spec/test.module', 'spec/test.script'], function(module){
 	require(['spec/test.module'], function(module){
-		console.log("module: ", module);
+		// note: jsverify is trying to access "process", which seems to be defined
+		// incorrectly by someone or other.
+		process.argv=[];
 		mocha.run();
 	});
 });
