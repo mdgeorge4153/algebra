@@ -17,6 +17,12 @@ function symmetric(op, env) {
   });
 }
 
+function antisymmetric(eq, op, env) {
+  jsc.property(op.name + " is antisymmetric", "e & e", env, function(e) {
+    return op(e[0],e[1]) && op(e[1],e[0]) ? eq(e[0],e[1]) : true;
+  });
+}
+
 function transitive(op, env) {
   jsc.property(op.name + " is transitive", "e & e & e", env, function(e) {
     return op(e[0],e[1]) && op(e[1], e[2]) ? op(e[0], e[2]) : true;
@@ -44,6 +50,19 @@ function hasInverse(eq, op, inv, id, env) {
 function commutative(eq, op, env) {
   jsc.property(op.name + " is commutative", "e", env, function(e) {
     return eq(op(e[0],e[1]), op(e[1],e[0]));
+  });
+}
+
+function hasInverseIf(eq, op, inv, id, condition, env) {
+  jsc.property(op.name + " has an inverse " + inv.name + " if " + condition.name,
+               "e", env, function(e) {
+    return condition(e) ? eq(id, op(e, inv(e))) : true;
+  });
+}
+
+function total(eq, op, env) {
+  jsc.property(op.name + " is total", "e & e", function(e) {
+    return eq(e[0], e[1]) || op(e[0], e[1]) || op(e[1], e[0]);
   });
 }
 
@@ -120,9 +139,125 @@ exports.ringProperties = function(ring, env) {
   exports.abelianGroupProperties(ring, env);
 
   describe("ring properties", function() {
-    throw new Error("not implemented");
+    associative(ring.eq, ring.times,                env);
+    hasIdentity(ring.eq, ring.times, ring.one,      env);
+    distributesOver(ring.eq, ring.times, ring.plus, env);
+    hasInverseIf(ring.eq, ring.times, ring.inv. ring.one, ring.isUnit, env);
+
+    jsc.property("div works", "e & e", function() {
+      return ring.isUnit(e[1]) ? ring.eq(ring.div(e[0],e[1]),
+                                         ring.times(e[0], ring.inv(e[1])))
+                               : true;
+    });
+
+    jsc.property("fromInt works", "integer", function(n) {
+      var neg = n < 0;
+      var expected = ring.zero;
+
+      if (neg) {
+        for (int i = 0; i < n; i++)
+          expected = ring.minus(expected, ring.one);
+        expected = ring.neg(expected)
+      }
+      else {
+        for (int i = 0; i < n; i++)
+          expected = ring.plus(expected, ring.one);
+      }
+
+      return ring.eq(ring.fromInt(n), expected);
+    });
   });
 };
+
+/******************************************************************************/
+
+exports.commutativeRingProperties = function(ring, env) {
+  exports.ringProperties(ring, env);
+
+  describe("commutative ring properties", function() {
+    commutative(ring.eq, ring.times);
+  });
+};
+
+/******************************************************************************/
+
+exports.fieldProperties = function(field, env) {
+  exports.commutativeRingProperties(field, env);
+
+  describe("field properties", function() {
+    hasInverseIf(field.eq, field.times, field.inv, field.one, field.isNonZero, env);
+  });
+};
+
+/******************************************************************************/
+
+exports.partialOrderProperties = function(po, env) {
+  exports.setProperties(po, env);
+
+  describe("partial order properties", function() {
+    reflexive(po.eq,     po.leq, env);
+    transitive(po.eq,    po.leq, env);
+    antisymmetric(po.eq, po.leq, env);
+
+    jsc.property("lt works", "e & e", env, function(e) {
+      return po.leq(e[0], e[1]) == po.lt(e[0], e[1]) || po.eq(e[0], e[1]);
+    });
+
+    jsc.property("geq works", "e & e", env, function(e) {
+      return po.geq(e[0], e[1]) == po.leq(e[1], e[0]);
+    });
+
+    jsc.property("gt works", "e & e", env, function(e) {
+      return po.geq(e[0], e[1]) == po.gt(e[0], e[1]) || po.eq(e[0], e[1]);
+    });
+
+    jsc.property("cmp works", "e & e", env, function(e) {
+      return ((po.cmp(e[0], e[1])  < 0) == (po.lt(e[0], e[1])))
+          && ((po.cmp(e[0], e[1]) == 0) == (po.eq(e[0], e[1])))
+          && ((po.cmp(e[0], e[1])  > 0) == (po.gt(e[0], e[1])));
+    });
+
+    jsc.property("min is in array", "array e", env, function(es) {
+      throw new Error("not implemented");
+    });
+
+    jsc.property("min is smallest", "array e", env, function(es) {
+      throw new Error("not implemented");
+    });
+
+    jsc.property("max is in array", "array e", env, function(es) {
+      throw new Error("not implemented");
+    });
+
+    jsc.property("max is biggest", "array e", env, function(es) {
+      throw new Error("not implemented");
+    });
+
+    jsc.property("minInd is in array", "array e", env, function(es) {
+      throw new Error("not implemented");
+    });
+
+    jsc.property("minInd is smallest", "array e", env, function(es) {
+      throw new Error("not implemented");
+    });
+
+    jsc.property("maxInd is in array", "array e", env, function(es) {
+      throw new Error("not implemented");
+    });
+
+    jsc.property("maxInd is biggest", "array e", env, function(es) {
+      throw new Error("not implemented");
+    });
+  });
+};
+
+/******************************************************************************/
+
+exports.totalOrderProperties = function(order, env) {
+  exports.partialOrderProperties(order, env);
+
+  total(order.eq, order.leq, env);
+}
 
 return exports;
 
