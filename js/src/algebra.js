@@ -1,243 +1,349 @@
-define(["interface", "properties", "util"],
-function(Interface,   props,        Util) {
-with(props) {
+define(["jsc"],
+function(jsc) {
 
 var exports = {};
 
 /******************************************************************************/
-var Set    = new Interface();
 
-var E      = Set.hasTypeParam("E");
-var equals = Set.hasOperation("equals", [E, E, Interface.bool]);
-var isElem = Set.hasOperation("isElem", [E, Interface.bool]);
+/**
+ * OrderedField operations
+ *
+ * @interface @name OrderedField
+ *
+ * @property {E}         Monoid#zero
+ * @property {E}           Ring#one
+ *
+ * @method   @name          Set#equals      @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name          Set#isInstance  @param {E} e                @returns {boolean}
+ * @method   @name          Set#ofString    @param {String} s           @returns {E}
+ * @method   @name          Set#stringOf    @param {E} e                @returns {String}
+ * @method   @name       Monoid#plus        @param {E} e1 @param {E} e2 @returns {E}
+ * @method   @name        Group#neg         @param {E} e                @returns {E}
+ * @method   @name         Ring#times       @param {E} e1 @param {E} e2 @returns {E}
+ * @method   @name        Field#isUnit      @param {E} e                @returns {boolean}
+ * @method   @name         Ring#inv         @param {E} e                @returns {E}
+ * @method   @name PartialOrder#leq         @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name OrderedField#toNumber    @param {E} e                @returns {number}
+ *
+ * @method   @name          Set#neq         @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name       Monoid#isZero      @param {E} e                @returns {boolean}
+ * @method   @name       Monoid#isNonZero   @param {E} e                @returns {boolean}
+ * @method   @name        Group#minus       @param {E} e1 @param {E} e2 @returns {E}
+ * @method   @name         Ring#div         @param {E} e1 @param {E} e2 @returns {E}
+ * @method   @name         Ring#fromInt     @param {int} n              @returns {E}
+ * @method   @name PartialOrder#lt          @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name PartialOrder#geq         @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name PartialOrder#gt          @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name PartialOrder#cmp         @param {E} e1 @param {E} e2 @returns {int}
+ * @method   @name PartialOrder#min         @param {E...} es            @returns {E}
+ * @method   @name PartialOrder#max         @param {E...} es            @returns {E}
+ * @method   @name PartialOrder#minInd      @param {E[]}  es            @returns {int}
+ * @method   @name PartialOrder#maxInd      @param {E[]}  es            @returns {int}
+ * @method   @name  OrderedRing#sign        @param {E} e                @returns {E}
+ * @method   @name  OrderedRing#isNonNeg    @param {E} e                @returns {boolean}
+ */
 
-var stringOf = Set.hasOperation("stringOf", [E, Interface.string]);
-var ofString = Set.hasOperation("ofString", [Interface.string, E]);
+/**
+ * PartialOrder operations
+ * @interface @name PartialOrder
+ *
+ * @method   @name          Set#equals      @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name          Set#isElem      @param {E} e                @returns {boolean}
+ * @method   @name          Set#ofString    @param {String} s           @returns {E}
+ * @method   @name          Set#stringOf    @param {E} e                @returns {String}
+ * @method   @name          Set#neq         @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name PartialOrder#leq         @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name PartialOrder#lt          @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name PartialOrder#geq         @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name PartialOrder#gt          @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name PartialOrder#cmp         @param {E} e1 @param {E} e2 @returns {int}
+ * @method   @name PartialOrder#min         @param {E...} es            @returns {E}
+ * @method   @name PartialOrder#max         @param {E...} es            @returns {E}
+ * @method   @name PartialOrder#minInd      @param {E[]}  es            @returns {int}
+ * @method   @name PartialOrder#maxInd      @param {E[]}  es            @returns {int}
+ */
 
-/* TODO: specs on ofString/stringOf */
+/** @function @name invertPO @param {PartialOrder} order @returns {PartialOrder} */
 
-Set.requires(isElem, isTrue);
-
-Set.requires(equals, isReflexive);
-Set.requires(equals, isTransitive);
-Set.requires(equals, isSymmetric);
-Set.requires(equals, isEquality);
-
-Set.addDefaultOperation("neq", [E, E, Interface.bool],
-  function neq (a, b) { return ! this.equals(a, b); }
-);
-
-Object.freeze(Set);
-exports.Set = Set;
+/**
+ * InnerProduct operations
+ * @interface VectorSpace
+ *
+ * @property {Ring} r
+ * @method   @name          Set#equals      @param {E} e1 @param {E} e2 @returns {boolean}
+ * @method   @name          Set#isElem      @param {E} e                @returns {boolean}
+ * @method   @name          Set#ofString    @param {String} s           @returns {E}
+ * @method   @name          Set#stringOf    @param {E} e                @returns {String}
+ * @method   @name       Monoid#plus        @param {E} e1 @param {E} e2 @returns {E}
+ * @method   @name       Monoid#isZero      @param {E} e                @returns {boolean}
+ * @method   @name       Monoid#isNonZero   @param {E} e                @returns {boolean}
+ * @method   @name AbelianGroup#neg         @param {E} e                @returns {E}
+ * @method   @name AbelianGroup#minus       @param {E} e1 @param {E} e2 @returns {E}
+ * @method   @name  VectorSpace#smult       @param {S} s  @param {E} v  @returns {E}
+ * @method   @name  VectorSpace#sdiv        @param {E} v  @param {S} s  @returns {E}
+ * @method   @name InnerProduct#dot         @param {E} v1 @param {E} v2 @returns {S}
+ * @method   @name InnerProduct#norm2       @param {E} v1 @param {E} v2 @returns {S}
+ */
 
 /******************************************************************************/
-var Monoid = new Interface();
 
-Monoid.isA(Set);
+function reflexive(op, env) {
+  jsc.property(op.name + " is reflexive", "e", env, function(e) {
+    return op(e,e);
+  });
+}
 
-var plus = Monoid.hasOperation("plus", [E, E, E]);
+function symmetric(op, env) {
+  jsc.property(op.name + " is symmetric", "e & e", env, function(e) {
+    return op(e[0],e[1]) == op(e[1],e[0]);
+  });
+}
 
-var zero = Monoid.hasProperty("zero", E);
+function transitive(op, env) {
+  jsc.property(op.name + " is transitive", "e & e & e", env, function(e) {
+    return op(e[0],e[1]) && op(e[1], e[2]) ? op(e[0], e[2]) : true;
+  });
+}
 
-Monoid.requires(plus, hasIdentity, zero);
-Monoid.requires(plus, isAssociative);
+function associative(eq, op, env) {
+  jsc.property(op.name + " is associative", "e & e & e", env, function(e) {
+    return eq(op(e[0], op(e[1], e[2])), op(op(e[0], e[1]), e[2]));
+  };
+}
 
-Object.freeze(Monoid);
-exports.Monoid = Monoid;
+function hasIdentity(eq, op, id, env) {
+  jsc.property(op.name + " has identity", "e", env, function(e) {
+    return eq(e, op(e, id)) && eq(e, op(id, e));
+  };
+}
+
+function hasInverse(eq, op, inv, id, env) {
+  jsc.property(op.name + " has inverse " + inv.name, "e", env, function(e) {
+    return eq(id,op(e, inv(e)));
+  });
+}
+
+function commutative(eq, op, env) {
+  jsc.property(op.name + " is commutative", "e", env, function(e) {
+    return eq(op(e[0],e[1]), op(e[1],e[0]));
+  };
+}
+
 
 /******************************************************************************/
-var Group = new Interface();
 
-Group.isA(Monoid);
+exports.Set = function() {
+  this.neq = function(e) {
+    return !eq(e);
+  };
+};
 
-var neg = Group.hasOperation("neg", [E, E]);
+exports.setProperties = function(set, env) {
+  describe("set properties", function() {
 
-Group.requires(plus, hasInverse, neg, zero);
+    reflexive(set.eq,env);
+    symmetric(set.eq,env);
+    transitive(set.eq,env);
 
-Group.addDefaultOperation("minus", [E, E, E],
-  function minus (a, b) { return this.plus(a, this.neg(b)); }
-);
+    jsc.property("generator makes instances", "e", env, function(e) {
+      return set.isInstance(e);
+    });
 
-Group.addDefaultOperation("isZero", [E, Interface.bool],
-  function isZero (a) { return this.equals(a, this.zero()); }
-);
+    jsc.property("ofString and stringOf inverses", "e", env, function(e) {
+      return set.eq(e, set.ofString(set.stringOf(e)));
+    });
 
-Object.freeze(Group);
-exports.Group = Group;
+    jsc.property("neq works", "e & e", env, function(e) {
+      return set.neq(e[0], e[1]) == !set.eq(e[0],e[1]);
+    });
+  });
+};
 
 /******************************************************************************/
-var AbelianGroup = new Interface();
 
-AbelianGroup.isA(Group);
+exports.Monoid = function() {
+  exports.Set.call(this);
 
-AbelianGroup.requires(plus, isCommutative);
+  this.isZero = function(e) {
+    return eq(e,zero);
+  };
 
-Object.freeze(AbelianGroup);
-exports.AbelianGroup = AbelianGroup;
+  this.isNonZero = function(e) {
+    return !eq(e,zero);
+  };
+};
+
+exports.monoidProperties = function(monoid, env) {
+  exports.setProperties(monoid, env);
+
+  describe("monoid properties", function() {
+    associative(monoid.eq,monoid.plus, env);
+    hasIdentity(monoid.eq,monoid.plus,monoid.zero, env);
+
+    jsc.property("isZero works", "e", env, function(e) {
+      return monoid.isZero(e) == monoid.eq(monoid.zero, e);
+    });
+
+    jsc.property("isNonZero works", "e", env, function(e) {
+      return monoid.isNonZero(e) == !monoid.isZero(e);
+    });
+  });
+};
 
 /******************************************************************************/
-var Ring = new Interface();
 
-Ring.isA(AbelianGroup);
+exports.Group = function() {
+  exports.Monoid.call(this);
 
-var times  = Ring.hasOperation("times",  [E, E, E]);
-var isUnit = Ring.hasOperation("isUnit", [E, Interface.bool]);
-var one    = Ring.hasProperty ("one",    E);
+  this.minus = function(e1, e2) {
+    return plus(e1, neg(e2));
+  };
+};
 
-var inv    = Ring.hasOperation("inv", [E, E]);
+exports.groupProperties = function(group, env) {
+  exports.monoidProperties(group, env);
 
-Ring.requires(times, isAssociative);
-Ring.requires(times, distributesOver, plus);
+  describe("group properties", function() {
+    hasInverse(group.eq, group.plus, group.neg, group.zero, env);
 
-Ring.requires(times, hasIdentity, one);
+    jsc.property("minus works", "e & e", env, function(e) {
+      return group.eq(group.minus(e[0], e[1]),
+                      group.plus(e[0], group.neg(e[1])));
+    });
+  });
+};
 
-Ring.requires(inv, isInverseIf, isUnit, one);
+exports.abelianGroupProperties = function(group, env) {
+  exports.groupProperties(group, env);
 
-Ring.addDefaultOperation("div", [E, E, E],
-  function div (a, b) { return this.times(a, this.inv(b)); }
-);
+  describe("abelian group properties", function() {
+    commutative(group.eq, group.plus, env);
+  });
+};
 
-Ring.addDefaultOperation("fromInt", [Interface.integer, E],
-  function fromInt (n) {
-    if (n < 0)
-      return this.neg(this.fromInt(-n));
-    else if (n == 0)
-      return this.zero;
-    else {
-      var bit  = n % 2 == 0 ? this.zero : this.one;
-      var rest = fromInt.call(this, Math.floor(n / 2));
-      return this.plus(this.plus(rest, rest), bit);
+/******************************************************************************/
+
+exports.Ring = function() {
+  exports.Group.call(this);
+
+  this.div = function (e1, e2) {
+    return times(e1, inv(e2));
+  };
+
+  this.fromInt = function (i) {
+    if (i < 0)  return neg(fromInt(-i));
+    if (i == 0) return zero;
+
+    var rest = fromInt(Math.floor(i/2));
+    rest = plus(rest,rest);
+    return i % 2 == 0 ? rest : plus(one, rest);
+  };
+};
+
+exports.ringProperties = function(ring, env) {
+  exports.abelianGroupProperties(ring, env);
+
+  describe("ring properties", function() {
+    throw new Error("not implemented");
+  });
+}
+
+/******************************************************************************/
+
+exports.PartialOrder = function() {
+  this.geq = function (e1, e2) {
+    return leq(e2,e1);
+  };
+
+  this.lt = function (e1, e2) {
+    return !geq(e1,e2);
+  };
+
+  this.gt = function (e1, e2) {
+    return !leq(e1,e2);
+  };
+
+  this.cmp = function (e1, e2) {
+    return  eq(e1,e2) ? 0  :
+           leq(e1,e2) ? -1 : 1;
+  };
+
+  this.minInd = function (es) {
+    var min    = undefined;
+    var minInd = undefined;
+    for (var i in es) {
+      if (es[i] == undefined) continue;
+      if (min   == undefined || lt(es[i],min)) {
+        minInd = i;
+        min = es[i];
+      }
     }
-  }
-);
+    return minInd;
+  };
 
-Object.freeze(Ring);
-exports.Ring = Ring;
+  this.maxInd = function (es) {
+    var max    = undefined;
+    var maxInd = undefined;
+    for (var i in es) {
+      if (es[i] == undefined) continue;
+      if (max   == undefined || gt(es[i],max)) {
+	maxInd = i;
+	max = es[i];
+      }
+    }
+    return maxInd;
+  };
 
-/******************************************************************************/
-var CommRing = new Interface();
+  this.min = function() {
+    return arguments[minInd(arguments)];
+  };
 
-CommRing.isA(Ring);
-CommRing.requires(times, isCommutative);
-
-Object.freeze(CommRing);
-exports.CommRing = CommRing;
-
-/******************************************************************************/
-var Field = new Interface();
-
-Field.isA(CommRing);
-
-Field.requires(isUnit, isTrueUnless, "isZero");
-
-Object.freeze(Field);
-exports.Field = Field;
-
-/******************************************************************************/
-var OrderedRing = new Interface();
-
-OrderedRing.isA(Ring);
-
-var isNonNeg = OrderedRing.hasOperation("isNonNeg", [E, Interface.bool]);
-
-OrderedRing.requires(isNonNeg, trueOfMinusOne);
-OrderedRing.requires(isNonNeg, trueOfSquares);
-OrderedRing.requires(isNonNeg, preservedBy, plus);
-OrderedRing.requires(isNonNeg, preservedBy, times);
-
-OrderedRing.addDefaultOperation("le", [E, E, Interface.bool],
-  function le (a, b) { return this.isNonNeg(this.minus(b, a)); }
-);
-
-OrderedRing.addDefaultOperation("lt", [E, E, Interface.bool],
-  function lt (a, b) { return !this.ge(a, b); }
-);
-
-OrderedRing.addDefaultOperation("ge", [E, E, Interface.bool],
-  function ge (a, b) { return this.le(b, a); }
-);
-
-OrderedRing.addDefaultOperation("gt", [E, E, Interface.bool],
-  function gt (a, b) { return !this.le(a,b); }
-);
-
-OrderedRing.addDefaultOperation("cmp", [E, E, Interface.integer],
-  function cmp (a, b) { return this.eq(a, b) ? 0  :
-                               this.le(a, b) ? -1 : 1; }
-);
-
-/* TODO: sign more useful if it returns E or integer? */
-OrderedRing.addDefaultOperation("sign", [E, Interface.integer],
-  function sign (a) {
-    var cmp = this.cmp(a,this.zero);
-    return cmp === 0 ? 0 :
-           cmp >   0 ? 1 : -1
-  }
-);
-
-OrderedRing.addDefaultOperation("min", [E, E, E],
-  function min (a,b) { return this.le(a,b) ? a : b; }
-);
-
-OrderedRing.addDefaultOperation("max", [E, E, E],
-  function max (a,b) { return this.le(a,b) ? b : a; }
-);
-
-Object.freeze(OrderedRing);
-exports.OrderedRing = OrderedRing;
-
-/******************************************************************************/
-var OrderedField = new Interface();
-
-OrderedField.isA(OrderedRing);
-OrderedField.isA(Field);
-
-OrderedField.hasOperation("toNumber", [E, Interface.number]);
-
-Object.freeze(OrderedField);
-exports.OrderedField = OrderedField;
-
-/******************************************************************************/
-
-function ModuleOver(r) {
-  var Module = new Interface();
-  var S      = r.E;
-
-  Module.isA(AbelianGroup);
-
-  Module.hasOperation("smult", [S, E, E]);
-
-  Module.requires(r,     props.isA, Ring);
-  Module.requires(times, props.distributesOver, r.plus);
-  Module.requires(times, props.associatesOver, r.times);
-
-  Module.addDefaultOperation("sdiv", [E, S, E],
-    function (v, s) { return this.smult(r.inv(s), v); }
-  );
-
-  Object.freeze(Module);
-  return Module;
+  this.max = function() {
+    return arguments[maxInd(arguments)];
+  };
 };
 
-exports.ModuleOver = Util.memoize(ModuleOver);
 
-/******************************************************************************/
+exports.OrderedRing = function() {
+  exports.Ring.call(this);
+  exports.PartialOrder.call(this);
 
-function VectorSpaceOver(f) {
-  var VectorSpace = new Interface();
+  this.sign = function(e) {
+    return eq(e,zero)  ? zero :
+           leq(e,zero) ? neg(one) : one;
+  };
 
-  VectorSpace.isA(ModuleOver(f));
+  this.isNonNeg = function(e) {
+    return leq(zero,e);
+  };
 
-  VectorSpace.requires(f, props.isA, Field);
+  this.isPos = function(e) {
+    return lt(zero,e);
+  };
 
-  Object.freeze(VectorSpace);
-  return VectorSpace;
+  this.isNeg = function(e) {
+    return lt(e,zero);
+  };
 };
 
-exports.VectorSpaceOver = Util.memoize(VectorSpaceOver);
+exports.Module = function() {
+  exports.Group.call(this);
 
-/******************************************************************************/
+  this.sdiv = function(v,s) {
+    return smult(s,v);
+  };
+};
+
+exports.VectorSpace = exports.Module;
+
+exports.InnerProductSpace = function () {
+  exports.VectorSpace.call(this);
+
+  this.norm2 = function(e) {
+    return dot(e,e);
+  };
+};
 
 return exports;
 
-}});
+});

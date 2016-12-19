@@ -91,14 +91,15 @@ function FieldOfFractions(ring, reduce) {
   this.toString = function (a) {
     return a.toString();
   }
+
+  algebra.Field.call(this);
 }
 
-function OrderedFieldOfFractions(orderedRing, reduce) {
-  OrderedField.call(this);
-  FieldOfFractions.call(this, orderedRing, reduce);
+function OrderedFieldOfFractions(ring, reduce) {
+  FieldOfFractions.call(this, ring, reduce);
 
-  this.isNonNeg = function (a) {
-    return orderedRing.isZero(a.num) || orderedRing.isNonNeg(a.num) == orderedRing.isNonNeg(a.den);
+  this.leq = function (e1,e2) {
+    ring.leq(ring.times(e1.num, e2.den), ring.times(e1.den, e2.num));
   };
 }
 

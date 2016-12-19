@@ -1,7 +1,7 @@
 /* float implementation *******************************************************/
 
-define(["algebra", "interface"],
-function(algebra,   Interface) {
+define(["algebra"],
+function(algebra) {
 
 var floats = {};
 
@@ -19,6 +19,8 @@ floats.toNumber  = function (a)   { return a;      };
 floats.stringOf  = function (a)   { return a.toString(); };
 floats.ofString  = parseFloat;
 
+algebra.OrderedField.call(floats);
+
 /* optimizations */
 floats.ne        = function (a,b) { return a != b; };
 floats.minus     = function (a,b) { return a - b;  };
@@ -30,9 +32,7 @@ floats.le        = function (a,b) { return a <= b; };
 floats.ge        = function (a,b) { return a >= b; };
 floats.cmp       = floats.minus;
 
-algebra.OrderedField.instantiate(floats);
-
-floats.floatSpec = Interface.numberSpec;
+Object.freeze(floats);
 
 return floats;
 
