@@ -1,4 +1,6 @@
-require.config(
+var requirejs = require('requirejs');
+
+requirejs.config(
   {
     baseUrl:'src/',
     paths:{
@@ -8,6 +10,7 @@ require.config(
   }
 );
 
+/**
 require(['require', 'lib/mocha'], function(require){
   mocha.setup('bdd');
   require(['spec/numbers'], function(module){
@@ -18,3 +21,5 @@ require(['require', 'lib/mocha'], function(require){
     mocha.run();
   });
 });
+*/
+
