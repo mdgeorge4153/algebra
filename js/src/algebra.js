@@ -214,6 +214,10 @@ exports.OrderedRing = function() {
   };
 };
 
+exports.OrderedField = function() {
+  exports.OrderedRing.call(this);
+};
+
 exports.Module = function() {
   exports.Group.call(this);
 

@@ -69,7 +69,7 @@ function total(eq, op, env) {
 /******************************************************************************/
 
 exports.setProperties = function(set, env) {
-  describe("set properties", function() {
+  describe("set properties:", function() {
 
     reflexive(set.eq,env);
     symmetric(set.eq,env);
@@ -94,7 +94,7 @@ exports.setProperties = function(set, env) {
 exports.monoidProperties = function(monoid, env) {
   exports.setProperties(monoid, env);
 
-  describe("monoid properties", function() {
+  describe("monoid properties:", function() {
     associative(monoid.eq,monoid.plus, env);
     hasIdentity(monoid.eq,monoid.plus,monoid.zero, env);
 
@@ -113,7 +113,7 @@ exports.monoidProperties = function(monoid, env) {
 exports.groupProperties = function(group, env) {
   exports.monoidProperties(group, env);
 
-  describe("group properties", function() {
+  describe("group properties:", function() {
     hasInverse(group.eq, group.plus, group.neg, group.zero, env);
 
     jsc.property("minus works", "e & e", env, function(e) {
@@ -128,7 +128,7 @@ exports.groupProperties = function(group, env) {
 exports.abelianGroupProperties = function(group, env) {
   exports.groupProperties(group, env);
 
-  describe("abelian group properties", function() {
+  describe("abelian group properties:", function() {
     commutative(group.eq, group.plus, env);
   });
 };
@@ -138,7 +138,7 @@ exports.abelianGroupProperties = function(group, env) {
 exports.ringProperties = function(ring, env) {
   exports.abelianGroupProperties(ring, env);
 
-  describe("ring properties", function() {
+  describe("ring properties:", function() {
     associative(ring.eq, ring.times,                env);
     hasIdentity(ring.eq, ring.times, ring.one,      env);
     distributesOver(ring.eq, ring.times, ring.plus, env);
@@ -155,12 +155,12 @@ exports.ringProperties = function(ring, env) {
       var expected = ring.zero;
 
       if (neg) {
-        for (int i = 0; i < n; i++)
+        for (var i = 0; i < n; i++)
           expected = ring.minus(expected, ring.one);
         expected = ring.neg(expected)
       }
       else {
-        for (int i = 0; i < n; i++)
+        for (var i = 0; i < n; i++)
           expected = ring.plus(expected, ring.one);
       }
 
@@ -174,7 +174,7 @@ exports.ringProperties = function(ring, env) {
 exports.commutativeRingProperties = function(ring, env) {
   exports.ringProperties(ring, env);
 
-  describe("commutative ring properties", function() {
+  describe("commutative ring properties:", function() {
     commutative(ring.eq, ring.times);
   });
 };
@@ -184,7 +184,7 @@ exports.commutativeRingProperties = function(ring, env) {
 exports.fieldProperties = function(field, env) {
   exports.commutativeRingProperties(field, env);
 
-  describe("field properties", function() {
+  describe("field properties:", function() {
     hasInverseIf(field.eq, field.times, field.inv, field.one, field.isNonZero, env);
   });
 };
@@ -194,7 +194,7 @@ exports.fieldProperties = function(field, env) {
 exports.partialOrderProperties = function(po, env) {
   exports.setProperties(po, env);
 
-  describe("partial order properties", function() {
+  describe("partial order properties:", function() {
     reflexive(po.eq,     po.leq, env);
     transitive(po.eq,    po.leq, env);
     antisymmetric(po.eq, po.leq, env);
