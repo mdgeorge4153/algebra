@@ -88,8 +88,8 @@ var exports = {};
 /******************************************************************************/
 
 exports.Set = function() {
-  this.neq = function(e) {
-    return !eq(e);
+  this.neq = function neq(e1, e2) {
+    return !this.eq(e1, e2);
   };
 };
 
@@ -98,12 +98,12 @@ exports.Set = function() {
 exports.Monoid = function() {
   exports.Set.call(this);
 
-  this.isZero = function(e) {
-    return eq(e,zero);
+  this.isZero = function isZero(e) {
+    return this.eq(e,this.zero);
   };
 
-  this.isNonZero = function(e) {
-    return !eq(e,zero);
+  this.isNonZero = function isNonZero(e) {
+    return !this.eq(e,this.zero);
   };
 };
 
@@ -112,7 +112,7 @@ exports.Monoid = function() {
 exports.Group = function() {
   exports.Monoid.call(this);
 
-  this.minus = function(e1, e2) {
+  this.minus = function minus(e1, e2) {
     return plus(e1, neg(e2));
   };
 };
@@ -122,11 +122,11 @@ exports.Group = function() {
 exports.Ring = function() {
   exports.Group.call(this);
 
-  this.div = function (e1, e2) {
+  this.div = function div (e1, e2) {
     return times(e1, inv(e2));
   };
 
-  this.fromInt = function (i) {
+  this.fromInt = function fromInt (i) {
     if (i < 0)  return neg(fromInt(-i));
     if (i == 0) return zero;
 
@@ -139,24 +139,24 @@ exports.Ring = function() {
 /******************************************************************************/
 
 exports.PartialOrder = function() {
-  this.geq = function (e1, e2) {
+  this.geq = function geq(e1, e2) {
     return leq(e2,e1);
   };
 
-  this.lt = function (e1, e2) {
+  this.lt = function lt(e1, e2) {
     return !geq(e1,e2);
   };
 
-  this.gt = function (e1, e2) {
+  this.gt = function gt(e1, e2) {
     return !leq(e1,e2);
   };
 
-  this.cmp = function (e1, e2) {
+  this.cmp = function cmp(e1, e2) {
     return  eq(e1,e2) ? 0  :
            leq(e1,e2) ? -1 : 1;
   };
 
-  this.minInd = function (es) {
+  this.minInd = function minInd(es) {
     var min    = undefined;
     var minInd = undefined;
     for (var i in es) {
@@ -169,7 +169,7 @@ exports.PartialOrder = function() {
     return minInd;
   };
 
-  this.maxInd = function (es) {
+  this.maxInd = function maxInd(es) {
     var max    = undefined;
     var maxInd = undefined;
     for (var i in es) {
@@ -182,11 +182,11 @@ exports.PartialOrder = function() {
     return maxInd;
   };
 
-  this.min = function() {
+  this.min = function min() {
     return arguments[minInd(arguments)];
   };
 
-  this.max = function() {
+  this.max = function max() {
     return arguments[maxInd(arguments)];
   };
 };
@@ -196,20 +196,20 @@ exports.OrderedRing = function() {
   exports.Ring.call(this);
   exports.PartialOrder.call(this);
 
-  this.sign = function(e) {
+  this.sign = function sign(e) {
     return eq(e,zero)  ? zero :
            leq(e,zero) ? neg(one) : one;
   };
 
-  this.isNonNeg = function(e) {
+  this.isNonNeg = function isNonNeg(e) {
     return leq(zero,e);
   };
 
-  this.isPos = function(e) {
+  this.isPos = function isPos(e) {
     return lt(zero,e);
   };
 
-  this.isNeg = function(e) {
+  this.isNeg = function isNeg(e) {
     return lt(e,zero);
   };
 };
@@ -221,7 +221,7 @@ exports.OrderedField = function() {
 exports.Module = function() {
   exports.Group.call(this);
 
-  this.sdiv = function(v,s) {
+  this.sdiv = function sdiv(v,s) {
     return smult(s,v);
   };
 };
@@ -231,7 +231,7 @@ exports.VectorSpace = exports.Module;
 exports.InnerProductSpace = function () {
   exports.VectorSpace.call(this);
 
-  this.norm2 = function(e) {
+  this.norm2 = function norm2(e) {
     return dot(e,e);
   };
 };

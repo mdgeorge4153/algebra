@@ -48,7 +48,7 @@ function hasInverse(eq, op, inv, id, env) {
 }
 
 function commutative(eq, op, env) {
-  jsc.property(op.name + " is commutative", "e", env, function(e) {
+  jsc.property(op.name + " is commutative", "e & e", env, function(e) {
     return eq(op(e[0],e[1]), op(e[1],e[0]));
   });
 }
@@ -59,6 +59,13 @@ function hasInverseIf(eq, op, inv, id, condition, env) {
     return condition(e) ? eq(id, op(e, inv(e))) : true;
   });
 }
+
+function distributesOver(eq, op1, op2, env) {
+  jsc.property(op1.name + " distributes over " + op2.name, "e & e & e", env, function(e) {
+    return eq(op1(e[0], op2(e[1], e[2])), op2(op1(e[0], e[1]), op1(e[0], e[2])));
+  });
+}
+
 
 function total(eq, op, env) {
   jsc.property(op.name + " is total", "e & e", function(e) {
@@ -142,29 +149,28 @@ exports.ringProperties = function(ring, env) {
     associative(ring.eq, ring.times,                env);
     hasIdentity(ring.eq, ring.times, ring.one,      env);
     distributesOver(ring.eq, ring.times, ring.plus, env);
-    hasInverseIf(ring.eq, ring.times, ring.inv. ring.one, ring.isUnit, env);
+    hasInverseIf(ring.eq, ring.times, ring.inv, ring.one, ring.isUnit, env);
 
-    jsc.property("div works", "e & e", function() {
+    jsc.property("div works", "e & e", env, function(e) {
       return ring.isUnit(e[1]) ? ring.eq(ring.div(e[0],e[1]),
                                          ring.times(e[0], ring.inv(e[1])))
                                : true;
     });
 
-    jsc.property("fromInt works", "integer", function(n) {
-      var neg = n < 0;
+    jsc.property("fromInt works (positive)", "nat", function(n) {
       var expected = ring.zero;
-
-      if (neg) {
-        for (var i = 0; i < n; i++)
-          expected = ring.minus(expected, ring.one);
-        expected = ring.neg(expected)
-      }
-      else {
-        for (var i = 0; i < n; i++)
-          expected = ring.plus(expected, ring.one);
-      }
+      for (var i = 0; i < n; i++)
+        expected = ring.plus(expected, ring.one);
 
       return ring.eq(ring.fromInt(n), expected);
+    });
+
+    jsc.property("fromInt works (negative)", "nat", function(n) {
+      var expected = ring.zero;
+      for (var i = 0; i < n; i++)
+        expected = ring.minus(expected, ring.one);
+
+      return ring.eq(ring.fromInt(-n), expected);
     });
   });
 };
@@ -175,7 +181,7 @@ exports.commutativeRingProperties = function(ring, env) {
   exports.ringProperties(ring, env);
 
   describe("commutative ring properties:", function() {
-    commutative(ring.eq, ring.times);
+    commutative(ring.eq, ring.times, env);
   });
 };
 
