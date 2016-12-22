@@ -49,7 +49,7 @@ function symmetric(set, op) {
 
 function antisymmetric(set, op) {
   jsc.property(name(op) + " is antisymmetric", "e & e", env(set), function(e) {
-    return op(e[0],e[1]) && op(e[1],e[0]) ? eq(e[0],e[1]) : true;
+    return op(e[0],e[1]) && op(e[1],e[0]) ? set.eq(e[0],e[1]) : true;
   });
 }
 
@@ -328,6 +328,50 @@ exports.fieldProperties = function(field) {
     hasInverseIf(field, field.times, field.inv, field.one, field.isNonZero);
   });
 };
+
+/******************************************************************************/
+
+exports.orderedRingProperties = function(or) {
+  exports.commutativeRingProperties(or);
+  exports.totalOrderProperties(or);
+
+  describe('ordered ring properties:', function() {
+    jsc.property("addition is monotonic", "e & e & e", env(or), function(e) {
+      return or.leq(e[0], e[1])
+           ? or.leq(or.plus(e[0], e[2]), or.plus(e[1], e[2]))
+           : true;
+    });
+  
+    jsc.property("multiplying positives gives positives", "e & e", env(or), function(e) {
+      return or.isNonNeg(e[0]) && or.isNonNeg(e[1])
+           ? or.isNonNeg(or.times(e[0], e[1]))
+           : true;
+    });
+  });
+}
+
+/******************************************************************************/
+
+exports.orderedFieldProperties = function(of) {
+  exports.orderedRingProperties(of);
+  exports.fieldProperties(of);
+
+  describe("ordered field properties", function () {
+    hasFunctionType(of, of.toNumber, "e", "number");
+
+    jsc.property("one is 1", function() {
+      return of.toNumber(of.one) == 1;
+    });
+
+    jsc.property("zero is 0", function() {
+      return of.toNumber(of.zero) == 0;
+    });
+
+    // TODO: what other properties need toNumber satisfy?
+    // TODO: perhaps there is a concise way to say "everything you can do with
+    //       numbers, you can do with this as well, and get the same answers.
+  });
+}
 
 /******************************************************************************/
 

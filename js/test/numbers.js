@@ -7,11 +7,11 @@ function(properties, jsc,
 {
 
 describe("Integers satisfy", function() {
-  properties.ringProperties(integers);
+  properties.orderedRingProperties(integers);
 });
 
 describe("Floats satisfy", function() {
-  properties.fieldProperties(floats);
+  properties.orderedFieldProperties(floats);
 });
 
 });
