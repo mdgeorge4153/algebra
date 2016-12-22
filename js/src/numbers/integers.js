@@ -3,40 +3,31 @@ function(Algebra,   BigInteger, Traits, jsc) {
 
 var ints = {};
 
-var arbBigint = jsc.pair(jsc.array(jsc.nat), jsc.bool).smap(
-  function(arr) {
-    return new BigInteger(arr[0], arr[1] ? 1 : -1);
+var arbBigint = jsc.integer.smap(
+  function(n) {
+    return BigInteger(n);
   },
 
-  function(n) {
-    var isNeg = n.isNegative();
-    if (isNeg) n = n.negate();
-
-    var result = [];
-    while (n.isPositive()) {
-      var divRem = n.divRem(10);
-      result[result.length] = divRem[1].toJSValue();
-      n = divRem[0];
-    }
-
-    return [result, !isNeg];
+  function(i) {
+    return i.toJSValue();
   },
 
-  function(n) {
-    return n.toString();
+  function(i) {
+    return i.toString();
   }
 );
 
 
 /* reguired implementations */
-ints.eq         = function (a,b) { return BigInteger.compare(a,b) == 0; };
-ints.isInstance = function (a)   { return a instanceof BigInteger; };
+ints.eq         = function eq(a,b)         { return BigInteger.compare(a,b) == 0; };
+ints.isInstance = function isInstance(a)   { return a instanceof BigInteger; };
 ints.arbitrary  = arbBigint;
 ints.zero       = BigInteger.ZERO;
-ints.plus       = BigInteger.add;
-ints.neg        = BigInteger.negate;
 ints.one        = BigInteger.ONE;
-ints.times      = BigInteger.multiply;
+ints.plus       = function plus(a,b)       { return BigInteger.add(a,b); };
+ints.neg        = function neg(a)          { return BigInteger.negate(a); };
+ints.times      = function times(a,b)      { return BigInteger.multiply(a,b); };
+
 ints.leq        = function leq      (a,b) { return BigInteger.compare(a,b) <= 0; };
 ints.toNumber   = function toNumber (a)   { return a.toJSValue(); };
 ints.stringOf   = function stringOf (a)   { return a.toString(); };
@@ -45,7 +36,7 @@ ints.isUnit     = function isUnit   (a)   { return ints.eq(a,ints.one) || ints.e
 ints.inv        = function inv      (a)   { if (!this.isUnit(a)) throw new Error("can't invert a non-unit");  return a; };
 
 /* optimizations */
-ints.minus    = BigInteger.subtract;
+ints.minus    = function minus(a,b) { return BigInteger.subtract(a,b); };
 ints.fromInt  = BigInteger;
 
 return Traits.create({}, Traits.override(Traits(ints), Algebra.OrderedRing));

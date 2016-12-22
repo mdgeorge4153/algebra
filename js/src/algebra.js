@@ -1,8 +1,6 @@
 define(['lib/traits'],
 function(Traits) {
 
-console.log(Traits);
-
 var exports = {};
 
 // implemented below.
@@ -82,7 +80,8 @@ exports.OrderedRing = Traits.compose(exports.CommutativeRing, exports.TotalOrder
   sign:       /** E      -> E      */ function sign(a) { return this.eq(a, this.zero) ? this.zero : this.leq(a, this.zero) ? this.neg(this.one) : this.one; },
   isNonNeg:   /** E      -> bool   */ function isNonNeg(a) { return this.leq(this.zero, a); },
   isNeg:      /** E      -> bool   */ function isNeg(a) { return this.lt(a, this.zero); },
-  isPos:      /** E      -> bool   */ function isPos(a) { return this.gt(a, this.zero); }
+  isPos:      /** E      -> bool   */ function isPos(a) { return this.gt(a, this.zero); },
+  abs:        /** E      -> E      */ function abs(a)   { return this.isNeg(a) ? this.neg(a) : a; }
 }));
 
 exports.OrderedField = Traits.compose(exports.OrderedRing, Traits({
