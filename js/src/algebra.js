@@ -1,240 +1,139 @@
-define([],
-function() {
+define(['lib/traits'],
+function(Traits) {
 
 var exports = {};
 
-/******************************************************************************/
-
-/**
- * OrderedField operations
- *
- * @interface @name OrderedField
- *
- * @property {E}         Monoid#zero
- * @property {E}           Ring#one
- *
- * @method   @name          Set#eq          @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name          Set#isInstance  @param {E} e                @returns {boolean}
- * @method   @name          Set#ofString    @param {String} s           @returns {E}
- * @method   @name          Set#stringOf    @param {E} e                @returns {String}
- * @method   @name       Monoid#plus        @param {E} e1 @param {E} e2 @returns {E}
- * @method   @name        Group#neg         @param {E} e                @returns {E}
- * @method   @name         Ring#times       @param {E} e1 @param {E} e2 @returns {E}
- * @method   @name        Field#isUnit      @param {E} e                @returns {boolean}
- * @method   @name         Ring#inv         @param {E} e                @returns {E}
- * @method   @name PartialOrder#leq         @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name OrderedField#toNumber    @param {E} e                @returns {number}
- *
- * @method   @name          Set#neq         @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name       Monoid#isZero      @param {E} e                @returns {boolean}
- * @method   @name       Monoid#isNonZero   @param {E} e                @returns {boolean}
- * @method   @name        Group#minus       @param {E} e1 @param {E} e2 @returns {E}
- * @method   @name         Ring#div         @param {E} e1 @param {E} e2 @returns {E}
- * @method   @name         Ring#fromInt     @param {int} n              @returns {E}
- * @method   @name PartialOrder#lt          @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name PartialOrder#geq         @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name PartialOrder#gt          @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name PartialOrder#cmp         @param {E} e1 @param {E} e2 @returns {int}
- * @method   @name PartialOrder#min         @param {E...} es            @returns {E}
- * @method   @name PartialOrder#max         @param {E...} es            @returns {E}
- * @method   @name PartialOrder#minInd      @param {E[]}  es            @returns {int}
- * @method   @name PartialOrder#maxInd      @param {E[]}  es            @returns {int}
- * @method   @name  OrderedRing#sign        @param {E} e                @returns {E}
- * @method   @name  OrderedRing#isNonNeg    @param {E} e                @returns {boolean}
- */
-
-/**
- * PartialOrder operations
- * @interface @name PartialOrder
- *
- * @method   @name          Set#eq          @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name          Set#isElem      @param {E} e                @returns {boolean}
- * @method   @name          Set#ofString    @param {String} s           @returns {E}
- * @method   @name          Set#stringOf    @param {E} e                @returns {String}
- * @method   @name          Set#neq         @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name PartialOrder#leq         @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name PartialOrder#lt          @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name PartialOrder#geq         @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name PartialOrder#gt          @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name PartialOrder#cmp         @param {E} e1 @param {E} e2 @returns {int}
- * @method   @name PartialOrder#min         @param {E...} es            @returns {E}
- * @method   @name PartialOrder#max         @param {E...} es            @returns {E}
- * @method   @name PartialOrder#minInd      @param {E[]}  es            @returns {int}
- * @method   @name PartialOrder#maxInd      @param {E[]}  es            @returns {int}
- */
-
-/** @function @name invertPO @param {PartialOrder} order @returns {PartialOrder} */
-
-/**
- * InnerProduct operations
- * @interface VectorSpace
- *
- * @property {Ring} r
- * @method   @name          Set#eq          @param {E} e1 @param {E} e2 @returns {boolean}
- * @method   @name          Set#isElem      @param {E} e                @returns {boolean}
- * @method   @name          Set#ofString    @param {String} s           @returns {E}
- * @method   @name          Set#stringOf    @param {E} e                @returns {String}
- * @method   @name       Monoid#plus        @param {E} e1 @param {E} e2 @returns {E}
- * @method   @name       Monoid#isZero      @param {E} e                @returns {boolean}
- * @method   @name       Monoid#isNonZero   @param {E} e                @returns {boolean}
- * @method   @name AbelianGroup#neg         @param {E} e                @returns {E}
- * @method   @name AbelianGroup#minus       @param {E} e1 @param {E} e2 @returns {E}
- * @method   @name  VectorSpace#smult       @param {S} s  @param {E} v  @returns {E}
- * @method   @name  VectorSpace#sdiv        @param {E} v  @param {S} s  @returns {E}
- * @method   @name InnerProduct#dot         @param {E} v1 @param {E} v2 @returns {S}
- * @method   @name InnerProduct#norm2       @param {E} v1 @param {E} v2 @returns {S}
- */
+// implemented below.
+var fromIntImpl;
+var maxIndImpl;
+var minIndImpl;
 
 /******************************************************************************/
 
-exports.Set = function() {
-  this.neq = function neq(e1, e2) {
-    return !this.eq(e1, e2);
-  };
+exports.Set = Traits({
+  eq:         /** E, E   -> bool   */ Traits.required,
+  arbitrary:  /** jsc.arbitrary E  */ Traits.required,
+  isInstance: /** E      -> bool   */ Traits.required,
+  ofString:   /** string -> E      */ Traits.required,
+  stringOf:   /** E      -> string */ Traits.required,
+  neq:        /** E, E   -> bool   */ function neq(a,b) { return !this.eq(a,b); }
+});
+
+/** Orderings *****************************************************************/
+
+exports.PartialOrder = Traits.compose(exports.Set, Traits({
+  leq:        /** E, E   -> bool   */ Traits.required,
+  geq:        /** E, E   -> bool   */ function geq(a,b) { return this.leq(b,a); },
+  gt:         /** E, E   -> bool   */ function gt(a,b) { return this.geq(a,b) && !this.eq(a,b); },
+  lt:         /** E, E   -> bool   */ function lt(a,b) { return this.leq(a,b) && !this.eq(a,b); },
+  cmp:        /** E, E   -> int    */ function cmp(a,b) { return this.eq(a,b) ? 0 : this.leq(a,b) ? -1 : 1; },
+
+  /** return the index of the minimum/max element.  undefined entries are ignored */
+  minInd:     /** E[]    -> int    */ function minInd(as) { return minIndImpl.call(this,as); }
+  maxInd:     /** E[]    -> int    */ function maxInd(es) { return maxIndImpl.call(this,es); }
+
+  /** return the minimum/maximum argument.  undefined entries are ignored.
+   *  Returns undefined if there are no (defined) arguments.
+   */
+  min:        /** E...   -> E      */ function min() { return arguments[this.minInd(arguments)]; }
+  max:        /** E...   -> E      */ function max() { return arguments[this.maxInd(arguments)]; }
+}));
+
+exports.TotalOrder = Traits.override(Trait({
+  gt:         /** E, E   -> bool   */ function gt(a,b) { return !this.leq(a,b); },
+  lt:         /** E, E   -> bool   */ function lt(a,b) { return !this.geq(a,b); }
+}), exports.PartialOrder);
+
+/** Scalars *******************************************************************/
+
+exports.Monoid = Traits.compose(exports.Set, Traits({
+  plus:       /** E, E   -> E      */ Traits.required,
+  zero:       /**           E      */ Traits.required,
+  isZero:     /** E      -> bool   */ function isZero(a) { return this.eq(a, this.zero); },
+  isNonZero:  /** E      -> bool   */ function isNonZero(a) { return !this.eq(a, this.zero); }
+}));
+
+exports.Group = Traits.compose(exports.Monoid, Traits({
+  neg:        /** E      -> E      */ Traits.required,
+  minus:      /** E, E   -> E      */ function minus(a, b) { return this.plus(a, this.neg(b)); }
+}));
+
+exports.AbelianGroup = exports.Group;
+
+exports.Ring = Traits.compose(exports.AbelianGroup, Traits({
+  times:      /** E, E   -> E      */ Traits.required,
+  one:        /**           E      */ Traits.required,
+  inv:        /** E      -> E      */ Traits.required,
+
+  /** returns true if the given element has an inverse. */
+  isUnit:     /** E      -> bool   */ Traits.required,
+
+  div:        /** E, E   -> E      */ function div(a,b) { return this.times(a, this.inv(b)); }
+  fromInt:    /** int    -> E      */ function fromInt(a,b) { return fromIntImpl.call(this, a,b); }
+}));
+
+exports.CommutativeRing = exports.Ring
+
+exports.Field = exports.CommutativeRing
+
+exports.OrderedRing = Traits.compose(exports.CommutativeRing, exports.TotalOrder, Trait({
+  sign:       /** E      -> E      */ function sign(a) { return this.eq(a, this.zero) ? this.zero : this.leq(a, this.zero) ? this.neg(this.one) : this.one; },
+  isNonNeg:   /** E      -> bool   */ function isNonNeg(a) { return this.leq(this.zero, a); },
+  isNeg:      /** E      -> bool   */ function isNeg(a) { return this.lt(a, this.zero); },
+  isPos:      /** E      -> bool   */ function isPos(a) { return this.gt(a, this.zero); }
+});
+
+exports.OrderedField = Traits.compose(exports.OrderedRing, Traits({
+  toNumber:   /** E      -> number */
+}));
+
+/** Vectors *******************************************************************/
+
+exports.Module = Traits.compose(exports.Group, Traits({
+  scalars:    /** OrderedRing      */ Traits.required,
+  smult:      /** S, E   -> E      */ Traits.required,
+  sdiv:       /** E, S   -> E      */ function sdiv(v,s)  { return this.smult(this.scalars.inv(s), v); }
+}));
+
+exports.VectorSpace = Module
+
+exports.InnerProductSpace = Traits.compose(exports.VectorSpace, Traits({
+  dot:        /** E, E   -> S      */ Traits.required,
+  norm2:      /** E      -> S      */ function norm2(v) { return this.dot(v,v); }
+}));
+
+/** Implementations ***********************************************************/
+
+/** @see Ring.fromInt */
+fromIntImpl = function fromIntImpl (i) {
+  if (i < 0)  return this.neg(fromIntImpl.call(this,-i));
+  if (i == 0) return this.zero;
+
+  var rest = fromIntImpl.call(this,Math.floor(i/2));
+  rest = this.plus(rest,rest);
+  return i % 2 == 0 ? rest : this.plus(this.one, rest);
 };
 
-/******************************************************************************/
-
-exports.Monoid = function() {
-  exports.Set.call(this);
-
-  this.isZero = function isZero(e) {
-    return this.eq(e,this.zero);
-  };
-
-  this.isNonZero = function isNonZero(e) {
-    return !this.eq(e,this.zero);
-  };
-};
-
-/******************************************************************************/
-
-exports.Group = function() {
-  exports.Monoid.call(this);
-
-  this.minus = function minus(e1, e2) {
-    return plus(e1, neg(e2));
-  };
-};
-
-/******************************************************************************/
-
-exports.Ring = function() {
-  exports.Group.call(this);
-
-  this.div = function div (e1, e2) {
-    return times(e1, inv(e2));
-  };
-
-  this.fromInt = function fromInt (i) {
-    if (i < 0)  return neg(fromInt(-i));
-    if (i == 0) return zero;
-
-    var rest = fromInt(Math.floor(i/2));
-    rest = plus(rest,rest);
-    return i % 2 == 0 ? rest : plus(one, rest);
-  };
-};
-
-/******************************************************************************/
-
-exports.PartialOrder = function() {
-  this.geq = function geq(e1, e2) {
-    return leq(e2,e1);
-  };
-
-  this.lt = function lt(e1, e2) {
-    return !geq(e1,e2);
-  };
-
-  this.gt = function gt(e1, e2) {
-    return !leq(e1,e2);
-  };
-
-  this.cmp = function cmp(e1, e2) {
-    return  eq(e1,e2) ? 0  :
-           leq(e1,e2) ? -1 : 1;
-  };
-
-  this.minInd = function minInd(es) {
-    var min    = undefined;
-    var minInd = undefined;
-    for (var i in es) {
-      if (es[i] == undefined) continue;
-      if (min   == undefined || lt(es[i],min)) {
-        minInd = i;
-        min = es[i];
-      }
+/** @see PartialOrder.minInd */
+minIndImpl = function minIndImpl(es) {
+  var min    = undefined;
+  var minInd = undefined;
+  for (var i in es) {
+    if (es[i] == undefined) continue;
+    if (min   == undefined || this.lt(es[i],min)) {
+      minInd = i;
+      min = es[i];
     }
-    return minInd;
-  };
-
-  this.maxInd = function maxInd(es) {
-    var max    = undefined;
-    var maxInd = undefined;
-    for (var i in es) {
-      if (es[i] == undefined) continue;
-      if (max   == undefined || gt(es[i],max)) {
-	maxInd = i;
-	max = es[i];
-      }
-    }
-    return maxInd;
-  };
-
-  this.min = function min() {
-    return arguments[minInd(arguments)];
-  };
-
-  this.max = function max() {
-    return arguments[maxInd(arguments)];
-  };
+  }
+  return minInd;
 };
 
-
-exports.OrderedRing = function() {
-  exports.Ring.call(this);
-  exports.PartialOrder.call(this);
-
-  this.sign = function sign(e) {
-    return eq(e,zero)  ? zero :
-           leq(e,zero) ? neg(one) : one;
-  };
-
-  this.isNonNeg = function isNonNeg(e) {
-    return leq(zero,e);
-  };
-
-  this.isPos = function isPos(e) {
-    return lt(zero,e);
-  };
-
-  this.isNeg = function isNeg(e) {
-    return lt(e,zero);
-  };
+/** @see PartialOrder.maxInd */
+maxIndImpl = function maxIndImpl(es) {
+  return minIndImpl.call({lt: this.gt;}, es);
 };
 
-exports.OrderedField = function() {
-  exports.OrderedRing.call(this);
-};
-
-exports.Module = function() {
-  exports.Group.call(this);
-
-  this.sdiv = function sdiv(v,s) {
-    return smult(s,v);
-  };
-};
-
-exports.VectorSpace = exports.Module;
-
-exports.InnerProductSpace = function () {
-  exports.VectorSpace.call(this);
-
-  this.norm2 = function norm2(e) {
-    return dot(e,e);
-  };
-};
+/******************************************************************************/
 
 return exports;
 
