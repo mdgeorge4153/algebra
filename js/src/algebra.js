@@ -1,6 +1,8 @@
 define(['lib/traits'],
 function(Traits) {
 
+console.log(Traits);
+
 var exports = {};
 
 // implemented below.
@@ -26,16 +28,16 @@ exports.PartialOrder = Traits.compose(exports.Set, Traits({
   geq:        /** E, E   -> bool   */ function geq(a,b) { return this.leq(b,a); },
   gt:         /** E, E   -> bool   */ function gt(a,b) { return this.geq(a,b) && !this.eq(a,b); },
   lt:         /** E, E   -> bool   */ function lt(a,b) { return this.leq(a,b) && !this.eq(a,b); },
-  cmp:        /** E, E   -> int    */ function cmp(a,b) { return this.eq(a,b) ? 0 : this.leq(a,b) ? -1 : 1; },
+  cmp:        /** E, E   -> number */ function cmp(a,b) { return this.eq(a,b) ? 0 : this.leq(a,b) ? -1 : 1; },
 
   /** return the index of the minimum/max element.  undefined entries are ignored */
-  minInd:     /** E[]    -> int    */ function minInd(as) { return minIndImpl.call(this,as); }
-  maxInd:     /** E[]    -> int    */ function maxInd(es) { return maxIndImpl.call(this,es); }
+  minInd:     /** E[]    -> int    */ function minInd(as) { return minIndImpl.call(this,as); },
+  maxInd:     /** E[]    -> int    */ function maxInd(es) { return maxIndImpl.call(this,es); },
 
   /** return the minimum/maximum argument.  undefined entries are ignored.
    *  Returns undefined if there are no (defined) arguments.
    */
-  min:        /** E...   -> E      */ function min() { return arguments[this.minInd(arguments)]; }
+  min:        /** E...   -> E      */ function min() { return arguments[this.minInd(arguments)]; },
   max:        /** E...   -> E      */ function max() { return arguments[this.maxInd(arguments)]; }
 }));
 
@@ -68,7 +70,7 @@ exports.Ring = Traits.compose(exports.AbelianGroup, Traits({
   /** returns true if the given element has an inverse. */
   isUnit:     /** E      -> bool   */ Traits.required,
 
-  div:        /** E, E   -> E      */ function div(a,b) { return this.times(a, this.inv(b)); }
+  div:        /** E, E   -> E      */ function div(a,b) { return this.times(a, this.inv(b)); },
   fromInt:    /** int    -> E      */ function fromInt(a,b) { return fromIntImpl.call(this, a,b); }
 }));
 
@@ -81,10 +83,10 @@ exports.OrderedRing = Traits.compose(exports.CommutativeRing, exports.TotalOrder
   isNonNeg:   /** E      -> bool   */ function isNonNeg(a) { return this.leq(this.zero, a); },
   isNeg:      /** E      -> bool   */ function isNeg(a) { return this.lt(a, this.zero); },
   isPos:      /** E      -> bool   */ function isPos(a) { return this.gt(a, this.zero); }
-});
+}));
 
 exports.OrderedField = Traits.compose(exports.OrderedRing, Traits({
-  toNumber:   /** E      -> number */
+  toNumber:   /** E      -> number */ Traits.required
 }));
 
 /** Vectors *******************************************************************/
@@ -95,7 +97,7 @@ exports.Module = Traits.compose(exports.Group, Traits({
   sdiv:       /** E, S   -> E      */ function sdiv(v,s)  { return this.smult(this.scalars.inv(s), v); }
 }));
 
-exports.VectorSpace = Module
+exports.VectorSpace = exports.Module
 
 exports.InnerProductSpace = Traits.compose(exports.VectorSpace, Traits({
   dot:        /** E, E   -> S      */ Traits.required,
@@ -130,7 +132,7 @@ minIndImpl = function minIndImpl(es) {
 
 /** @see PartialOrder.maxInd */
 maxIndImpl = function maxIndImpl(es) {
-  return minIndImpl.call({lt: this.gt;}, es);
+  return minIndImpl.call({lt: this.gt}, es);
 };
 
 /******************************************************************************/

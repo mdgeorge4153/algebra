@@ -11,6 +11,9 @@ requirejs.config({
   paths: {
     "lib":  "../lib",
     "data": "../data"
+  },
+  shim: {
+    "lib/traits": { exports: "Trait" }
   }
 });
 

@@ -5,70 +5,74 @@ var exports = {};
 
 /******************************************************************************/
 
+function name(op) {
+  return op.name.replace("bound", "");
+}
+
 function reflexive(op, env) {
-  jsc.property(op.name + " is reflexive", "e", env, function(e) {
+  jsc.property(name(op) + " is reflexive", "e", env, function(e) {
     return op(e,e);
   });
 }
 
 function symmetric(op, env) {
-  jsc.property(op.name + " is symmetric", "e & e", env, function(e) {
+  jsc.property(name(op) + " is symmetric", "e & e", env, function(e) {
     return op(e[0],e[1]) == op(e[1],e[0]);
   });
 }
 
 function antisymmetric(eq, op, env) {
-  jsc.property(op.name + " is antisymmetric", "e & e", env, function(e) {
+  jsc.property(name(op) + " is antisymmetric", "e & e", env, function(e) {
     return op(e[0],e[1]) && op(e[1],e[0]) ? eq(e[0],e[1]) : true;
   });
 }
 
 function transitive(op, env) {
-  jsc.property(op.name + " is transitive", "e & e & e", env, function(e) {
+  jsc.property(name(op) + " is transitive", "e & e & e", env, function(e) {
     return op(e[0],e[1]) && op(e[1], e[2]) ? op(e[0], e[2]) : true;
   });
 }
 
 function associative(eq, op, env) {
-  jsc.property(op.name + " is associative", "e & e & e", env, function(e) {
+  jsc.property(name(op) + " is associative", "e & e & e", env, function(e) {
     return eq(op(e[0], op(e[1], e[2])), op(op(e[0], e[1]), e[2]));
   });
 }
 
 function hasIdentity(eq, op, id, env) {
-  jsc.property(op.name + " has identity", "e", env, function(e) {
+  jsc.property(name(op) + " has identity", "e", env, function(e) {
     return eq(e, op(e, id)) && eq(e, op(id, e));
   });
 }
 
 function hasInverse(eq, op, inv, id, env) {
-  jsc.property(op.name + " has inverse " + inv.name, "e", env, function(e) {
+  jsc.property(name(op) + " has inverse " + name(inv), "e", env, function(e) {
     return eq(id,op(e, inv(e)));
   });
 }
 
 function commutative(eq, op, env) {
-  jsc.property(op.name + " is commutative", "e & e", env, function(e) {
+  jsc.property(name(op) + " is commutative", "e & e", env, function(e) {
     return eq(op(e[0],e[1]), op(e[1],e[0]));
   });
 }
 
 function hasInverseIf(eq, op, inv, id, condition, env) {
-  jsc.property(op.name + " has an inverse " + inv.name + " if " + condition.name,
+  jsc.property(name(op) + " has an inverse " + name(inv) + " if " + name(condition),
                "e", env, function(e) {
     return condition(e) ? eq(id, op(e, inv(e))) : true;
   });
 }
 
 function distributesOver(eq, op1, op2, env) {
-  jsc.property(op1.name + " distributes over " + op2.name, "e & e & e", env, function(e) {
+  jsc.property(name(op1) + " distributes over " + name(op2), "e & e & e", env, function(e) {
     return eq(op1(e[0], op2(e[1], e[2])), op2(op1(e[0], e[1]), op1(e[0], e[2])));
   });
 }
 
 
 function total(eq, op, env) {
-  jsc.property(op.name + " is total", "e & e", function(e) {
+  jsc.property(name(op) + " is total", "e & e", function(e) {
     return eq(e[0], e[1]) || op(e[0], e[1]) || op(e[1], e[0]);
   });
 }

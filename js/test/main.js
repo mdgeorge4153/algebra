@@ -8,7 +8,8 @@ requirejs.config(
     },
     shim:{
       'jasmine/jasmine-html': {deps: ['jasmine/jasmine']},
-      'jasmine/boot':         {deps: ['jasmine/jasmine', 'jasmine/jasmine-html']}
+      'jasmine/boot':         {deps: ['jasmine/jasmine', 'jasmine/jasmine-html']},
+      "lib/traits": { exports: "Trait" }
     }
   }
 );
