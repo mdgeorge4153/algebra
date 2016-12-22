@@ -3,7 +3,7 @@ function(Algebra,   BigInteger, Traits, jsc) {
 
 var ints = {};
 
-var arbBigint = jsc.pair(jsc.array(jsc.nat(10)), jsc.bool).smap(
+var arbBigint = jsc.pair(jsc.array(jsc.nat), jsc.bool).smap(
   function(arr) {
     return new BigInteger(arr[0], arr[1] ? 1 : -1);
   },
@@ -15,7 +15,7 @@ var arbBigint = jsc.pair(jsc.array(jsc.nat(10)), jsc.bool).smap(
     var result = [];
     while (n.isPositive()) {
       var divRem = n.divRem(10);
-      result[result.length] = divRem[1];
+      result[result.length] = divRem[1].toJSValue();
       n = divRem[0];
     }
 
@@ -42,7 +42,7 @@ ints.toNumber   = function toNumber (a)   { return a.toJSValue(); };
 ints.stringOf   = function stringOf (a)   { return a.toString(); };
 ints.ofString   = function ofString (s)   { return BigInteger(s); };
 ints.isUnit     = function isUnit   (a)   { return ints.eq(a,ints.one) || ints.eq(a, ints.neg(ints.one)); };
-ints.inv        = function inv      (a)   { if (!isUnit(a)) throw new Error("can't invert a non-unit");  return a; };
+ints.inv        = function inv      (a)   { if (!this.isUnit(a)) throw new Error("can't invert a non-unit");  return a; };
 
 /* optimizations */
 ints.minus    = BigInteger.subtract;
