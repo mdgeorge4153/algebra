@@ -3,12 +3,22 @@
 define(["algebra", "lib/traits", "lib/jsverify"],
 function(Algebra, Traits, jsc) {
 
+var arbFloat = jsc.number.smap(
+  function(exponent) {
+    return Math.pow(1000, exponent);
+  },
+
+  function(number) {
+    return Math.log10(number)/3;
+  }
+);
+
 var floats = {};
 
 /* reguired implementations */
-floats.eq         = function eq         (a,b) { return a == b; };
+floats.eq         = function eq         (a,b) { return Math.abs(a - b) < 0.000001; };
 floats.isInstance = function isInstance (a)   { return typeof a === "number"; };
-floats.arbitrary  = jsc.number;
+floats.arbitrary  = arbFloat;
 floats.zero       = 0.;
 floats.plus       = function plus       (a,b) { return a + b;  };
 floats.neg        = function neg        (a)   { return -a;     };

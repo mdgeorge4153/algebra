@@ -7,11 +7,11 @@ function(properties, jsc,
 {
 
 describe("Integers satisfy", function() {
-  properties.ringProperties(integers, {"e": integers.arbitrary});
+  properties.ringProperties(integers);
 });
 
 describe("Floats satisfy", function() {
-  properties.fieldProperties(floats, {"e": jsc.number});
+  properties.fieldProperties(floats);
 });
 
 });
