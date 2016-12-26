@@ -321,6 +321,54 @@ exports.commutativeRingProperties = function(ring) {
 
 /******************************************************************************/
 
+exports.euclideanRingProperties = function(ring) {
+  exports.commutativeRingProperties(ring);
+
+  describe("euclidean ring properties:", function() {
+    jsc.property("a = quot(a,b)b + rem(a,b)", "e & e", env(ring), function (e) {
+      return ring.isNonZero(e[1])
+           ? ring.eq(e[0], ring.plus(ring.times(ring.quot(e[0],e[1]), e[1]), ring.rem(e[0],e[1])))
+           : true;
+    });
+
+    jsc.property("remainder reduces degree", "e & e", env(ring), function (e) {
+      if (ring.isZero(e[1])) return true;
+
+      var r = ring.rem(e[0], e[1]);
+      return ring.isNonZero(r) ? ring.degree(r) < ring.degree(e[1]) : true;
+    });
+
+    jsc.property("degree is monotonic", "e & e", env(ring), function (e) {
+      return ring.isNonZero(e[0]) && ring.isNonZero(e[1])
+           ? ring.degree(e[0]) <= ring.degree(ring.times(e[0],e[1]))
+           : true;
+    });
+
+    jsc.property("gcd is a common divisor", "e & e", env(ring), function (e) {
+      var g = ring.gcd(e[0], e[1]);
+      throw new Error("TODO: not sure how to tell if g | e0 in arb. euclidean domain");
+    });
+
+    jsc.property("gcd is the greatest divisor", "e & e & e", env(ring), function (e) {
+      throw new Error("TODO");
+    });
+
+    jsc.property("bezout coefficients correct", "e & e", env(ring), function(e) {
+      var c = ring.bezout(e[0], e[1]);
+      return ring.eq(ring.gcd(e[0],e[1]),
+                     ring.plus(ring.times(c[0], e[0]), ring.times(c[1], e[1])));
+    });
+
+    jsc.property("reduce preserves quotient", "e & e", env(ring), function(e) {
+      if (ring.isZero(e[1])) return true;
+      var f = ring.reduce(e[0], e[1]);
+      return ring.eq(ring.times(e[0], f[1]), ring.times(f[0], e[1]));
+    });
+  });
+};
+
+/******************************************************************************/
+
 exports.fieldProperties = function(field) {
   exports.commutativeRingProperties(field);
 

@@ -7,6 +7,8 @@ var exports = {};
 var fromIntImpl;
 var maxIndImpl;
 var minIndImpl;
+var gcdImpl;
+var bezoutImpl;
 
 /******************************************************************************/
 
@@ -72,9 +74,31 @@ exports.Ring = Traits.compose(exports.AbelianGroup, Traits({
   fromInt:    /** int    -> E      */ function fromInt(a,b) { return fromIntImpl.call(this, a,b); }
 }));
 
-exports.CommutativeRing = exports.Ring
+exports.CommutativeRing = exports.Ring;
 
-exports.Field = exports.CommutativeRing
+exports.EuclideanRing = Traits.compose(exports.CommutativeRing, Traits({
+  quot:       /** E, E   -> E      */ Traits.required,
+  rem:        /** E, E   -> E      */ Traits.required,
+  degree:     /** E      -> nat    */ Traits.required,
+
+  gcd:        /** E, E   -> E      */ function gcd(a,b)    { return gcdImpl.call(this, a, b); },
+
+  /** return [s,t] such that gcd(a,b) = s*a + t*b */
+  bezout:     /** E, E   -> E, E   */ function bezout(a,b) { return bezoutImpl.call(this, a, b); },
+
+  /** return [a',b'] such that a/b = a'/b' (ideally producing a more efficient representation of a/b) */
+  reduce:     /** E, E   -> E, E   */ function reduce(a,b) { var g = this.gcd(a,b); return [this.quot(a, g), this.quot(b,g)]; }
+}));
+
+exports.Field = Traits.override(Traits({
+  quot:       /** E, E   -> E      */ function quot(a,b) { return this.div(a,b); },
+  rem:        /** E, E   -> E      */ function rem(a,b)  { return this.zero; },
+  degree:     /** E      -> nat    */ function degree(a) { return 0; },
+
+  gcd:        /** E, E   -> E      */ function gcd(a,b)  { return this.one; /* TODO? */ },
+  bezout:     /** E, E   -> E      */ function bezout(a,b) { return [this.zero, this.inv(b)]; },
+  reduce:     /** E, E   -> E, E   */ function reduce(a,b) { return [a,b]; },
+}), exports.EuclideanRing);
 
 exports.OrderedRing = Traits.compose(exports.CommutativeRing, exports.TotalOrder, Trait({
   sign:       /** E      -> E      */ function sign(a) { return this.eq(a, this.zero) ? this.zero : this.leq(a, this.zero) ? this.neg(this.one) : this.one; },
@@ -132,6 +156,16 @@ minIndImpl = function minIndImpl(es) {
 /** @see PartialOrder.maxInd */
 maxIndImpl = function maxIndImpl(es) {
   return minIndImpl.call({lt: this.gt}, es);
+};
+
+/** @see EuclideanRing.gcd */
+gcdImpl = function gcdImpl(a,b) {
+  throw new Error("Not Implemented");
+};
+
+/** @see EuclideanRing.bezout */
+bezoutImpl = function bezoutImpl(a,b) {
+  throw new Error("Not Implemented");
 };
 
 /******************************************************************************/
