@@ -87,15 +87,12 @@ exports.EuclideanRing = Traits.compose(exports.CommutativeRing, Traits({
 
   /** return [s,t] such that gcd(a,b) = s*a + t*b */
   bezout:     /** E, E   -> E, E   */ function bezout(a,b) { return bezoutImpl.call(this, a, b); },
-
-  /** return [a',b'] such that a/b = a'/b' (ideally producing a more efficient representation of a/b) */
-  reduce:     /** E, E   -> E, E   */ function reduce(a,b) { var g = this.gcd(a,b); return [this.quot(a, g), this.quot(b,g)]; }
 }));
 
 exports.Field = Traits.override(Traits({
-  quot:       /** E, E   -> E      */ function quot(a,b) { return this.div(a,b); },
-  rem:        /** E, E   -> E      */ function rem(a,b)  { return this.zero; },
-  degree:     /** E      -> nat    */ function degree(a) { return 0; },
+  divMod:     /** E, E   -> E, E   */ function divMod(a,b) { return [this.div(a,b), this.zero]; },
+  degree:     /** E      -> nat    */ function degree(a)   { return 0; },
+  isUnit:     /** E      -> bool   */ function isUnit(a)   { return this.isNonZero(a); },
 
   gcd:        /** E, E   -> E      */ function gcd(a,b)  { return this.one; /* TODO? */ },
   bezout:     /** E, E   -> E      */ function bezout(a,b) { return [this.zero, this.inv(b)]; },
@@ -112,7 +109,7 @@ exports.OrderedRing = Traits.compose(exports.CommutativeRing, exports.TotalOrder
 
 exports.OrderedEuclideanRing = Traits.compose(exports.EuclideanRing, exports.OrderedRing);
 
-exports.OrderedField = Traits.compose(exports.OrderedRing, Traits({
+exports.OrderedField = Traits.compose(exports.OrderedRing, exports.Field, Traits({
   toNumber:   /** E      -> number */ Traits.required
 }));
 
@@ -164,12 +161,34 @@ maxIndImpl = function maxIndImpl(es) {
 
 /** @see EuclideanRing.gcd */
 gcdImpl = function gcdImpl(a,b) {
-  throw new Error("Not Implemented");
+  // gcd(a,0) = a
+  // gcd(a,b) = gcd(b,r) where a = qb+r
+  while (this.isNonZero(b)) {
+    var t = b;
+    b = this.rem(a, b);
+    a = t;
+  }
+  return this.isNeg(a) ? this.neg(a) : a;
 };
 
 /** @see EuclideanRing.bezout */
 bezoutImpl = function bezoutImpl(a,b) {
-  throw new Error("Not Implemented");
+  // gcd(a,0) = a = 1*a + 0*0
+  // gcd(a,b) = gcd(b,r)         where a = qb + r
+  //          = s'b + t'r        recursively
+  //          = s'b + t'(a - qb) by above
+  //          = t'a + (s'-t'q)b  by algebra
+
+  if (this.isZero(b))
+    return [this.one, this.zero];
+
+  var divMod = this.divMod(a, b);
+  var q = divMod[0], r = divMod[1];
+
+  var brCoeffs = bezoutImpl(b,r);
+  var sPrime = brCoeffs[0], tPrime = brCoeffs[1];
+
+  return [tPrime, this.minus(sPrime, this.times(tPrime,q))];
 };
 
 /******************************************************************************/

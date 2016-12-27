@@ -38,10 +38,10 @@ ints.inv        = function inv      (a)   { if (!this.isUnit(a)) throw new Error
 ints.degree     = function degree   (a)   { return BigInteger.abs(a); };
 
 /* optimizations */
-ints.minus    = function minus(a,b) { return BigInteger.subtract(a,b); };
-ints.fromInt  = function fromInt(n) { return BigInteger(n); };
-ints.quot     = function quot(a,b)  { return BigInteger.divide(a,b); };
-ints.rem      = function rem(a,b)   { return BigInteger.remainder(a,b); };
+ints.minus    = function minus(a,b)  { return BigInteger.subtract(a,b); };
+ints.fromInt  = function fromInt(n)  { return BigInteger(n); };
+ints.quot     = function quot(a,b)   { return BigInteger.divide(a,b); };
+ints.rem      = function rem(a,b)    { return BigInteger.remainder(a,b); };
 
 return Traits.create({}, Traits.override(Traits(ints), Algebra.OrderedEuclideanRing));
 

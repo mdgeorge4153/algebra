@@ -1,9 +1,11 @@
 define(["test/algebra.properties", "lib/jsverify",
         "numbers/integers",
-        "numbers/floats"],
+        "numbers/floats",
+        "numbers/rationals"],
 function(properties, jsc,
          integers,
-         floats)
+         floats,
+         rationals)
 {
 
 describe("Integers satisfy", function() {
@@ -13,5 +15,9 @@ describe("Integers satisfy", function() {
 //describe("Floats satisfy", function() {
 //  properties.orderedFieldProperties(floats);
 //});
+
+describe("Rationals satisfy", function() {
+  properties.orderedFieldProperties(rationals);
+});
 
 });

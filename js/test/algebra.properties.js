@@ -364,6 +364,11 @@ exports.euclideanRingProperties = function(ring) {
       var f = ring.reduce(e[0], e[1]);
       return ring.eq(ring.times(e[0], f[1]), ring.times(f[0], e[1]));
     });
+
+    it("has enough euclidean domain tests", function() {
+      expect(false).toBe(true);
+    });
+
   });
 };
 
