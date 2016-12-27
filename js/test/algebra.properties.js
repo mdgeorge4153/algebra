@@ -400,6 +400,13 @@ exports.orderedRingProperties = function(or) {
 
 /******************************************************************************/
 
+exports.orderedEuclideanRingProperties = function(oer) {
+  exports.euclideanRingProperties(oer);
+  exports.orderedRingProperties(oer);
+}
+
+/******************************************************************************/
+
 exports.orderedFieldProperties = function(of) {
   exports.orderedRingProperties(of);
   exports.fieldProperties(of);

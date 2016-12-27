@@ -77,11 +77,13 @@ exports.Ring = Traits.compose(exports.AbelianGroup, Traits({
 exports.CommutativeRing = exports.Ring;
 
 exports.EuclideanRing = Traits.compose(exports.CommutativeRing, Traits({
-  quot:       /** E, E   -> E      */ Traits.required,
-  rem:        /** E, E   -> E      */ Traits.required,
+  divMod:     /** E, E   -> E, E   */ Traits.required,
   degree:     /** E      -> nat    */ Traits.required,
 
   gcd:        /** E, E   -> E      */ function gcd(a,b)    { return gcdImpl.call(this, a, b); },
+
+  quot:       /** E, E   -> E      */ function quot(a,b)   { return this.divMod(a,b)[0]; },
+  rem:        /** E, E   -> E      */ function quot(a,b)   { return this.divMod(a,b)[1]; },
 
   /** return [s,t] such that gcd(a,b) = s*a + t*b */
   bezout:     /** E, E   -> E, E   */ function bezout(a,b) { return bezoutImpl.call(this, a, b); },
@@ -107,6 +109,8 @@ exports.OrderedRing = Traits.compose(exports.CommutativeRing, exports.TotalOrder
   isPos:      /** E      -> bool   */ function isPos(a) { return this.gt(a, this.zero); },
   abs:        /** E      -> E      */ function abs(a)   { return this.isNeg(a) ? this.neg(a) : a; }
 }));
+
+exports.OrderedEuclideanRing = Traits.compose(exports.EuclideanRing, exports.OrderedRing);
 
 exports.OrderedField = Traits.compose(exports.OrderedRing, Traits({
   toNumber:   /** E      -> number */ Traits.required

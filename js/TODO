@@ -2,4 +2,6 @@
  - ensure that pqueue test / arbitrary operation list produces large queues
  - enhance traits so that types are included; add property tests to ensure types of functions
  - add jasmine dependencies to tests properly
+ - finish euclidean domain stuff
+ - avoid duplicate tests
 

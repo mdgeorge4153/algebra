@@ -7,7 +7,7 @@ function(properties, jsc,
 {
 
 describe("Integers satisfy", function() {
-  properties.orderedRingProperties(integers);
+  properties.orderedEuclideanRingProperties(integers);
 });
 
 //describe("Floats satisfy", function() {
