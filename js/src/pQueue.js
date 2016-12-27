@@ -23,8 +23,8 @@ var par = function(i) {
  * @alias module:pQueue
  */
 function PQueue(priorityOrder) {
-  this.impl  = [];
-  this.order = priorityOrder;
+  this.impl = [];
+  this.C    = priorityOrder;
 };
 
 /** Add an element */
@@ -34,14 +34,16 @@ PQueue.prototype.add = function(e) {
   impl[i] = e;
 
   // invariant: impl[i] == e
-  while (i != 0 && order.gt(impl[parent(i)], impl[i])) {
+  while (i != 0 && C.gt(impl[parent(i)], impl[i])) {
     impl[i] = impl[parent(i)];
     i = parent(i);
     impl[i] = e;
   }
 };
 
-/** Remove and return the element with the minimum priority */
+/** Remove and return the element with the minimum priority.  Returns undefined
+ *  if the queue is empty.
+ */
 PQueue.prototype.remove = function() {
   var result = impl[0];
 
@@ -52,12 +54,17 @@ PQueue.prototype.remove = function() {
   var i   = 0;
   impl[i] = bubble;
   while (true) {
-    switch(order.minInd([impl[i],impl[left(i)],impl[right(i)]])) {
+    switch(C.minInd([impl[i],impl[left(i)],impl[right(i)]])) {
       case 0: return;
       case 1: impl[i] = impl[left(i)];  i = left(i);  impl[i] = bubble; break;
       case 1: impl[i] = impl[right(i)]; i = right(i); impl[i] = bubble; break;
     }
   }
+};
+
+/** Return smallest priority element, or undefined if the queue is empty */
+PQueue.prototype.poll = function() {
+  return this.impl[0];
 };
 
 /** Return true if the queue is empty */
@@ -68,6 +75,19 @@ PQueue.prototype.isEmpty = function() {
 /** Return the number of elements in the queue */
 PQueue.prototype.size = function() {
   return impl.length;
+};
+
+/** Return the elements in an unspecified order. */
+PQueue.prototype.elements = function() {
+  return impl.slice();
+};
+
+/** Return true if this satisfies its invariants. */
+PQueue.prototype.invariant = function() {
+  for (var i in this.impl)
+    if (C.minInd(impl[i], impl[left(i)], impl[right(i)]) != 0)
+      return false;
+  return true;
 };
 
 });
