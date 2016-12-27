@@ -143,7 +143,7 @@ fromIntImpl = function fromIntImpl (i) {
 minIndImpl = function minIndImpl(es) {
   var min    = undefined;
   var minInd = undefined;
-  for (var i in es) {
+  for (var i = 0; i < es.length; i++) {
     if (es[i] == undefined) continue;
     if (min   == undefined || this.lt(es[i],min)) {
       minInd = i;

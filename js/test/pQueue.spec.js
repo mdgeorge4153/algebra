@@ -1,36 +1,36 @@
-define(["pQueue", "numbers/integers", "lib/jsverify"],
-function(PQueue,   Integers,           jsc) {
+define(["pQueue", "numbers/floats", "lib/jsverify"],
+function(PQueue,   C,                jsc) {
 
 /** A jsc environment for constructing test cases */
 var env = {
-  "ops"   : jsc.array(jsc.either(jsc.unit, Integers.arbitrary)),
-  "e"     : Integers.arbitrary,
+  "ops"   : jsc.array(jsc.either(jsc.unit, C.arbitrary)),
+  "e"     : C.arbitrary,
   "empty" : jsc.unit.smap
 };
 
 /** apply a sequence of operations to the given queue and return it. */
 function applyOps(pq, opList) {
-  for (var i in opList)
-    opList[i].either(pq.remove, pq.add);
+  for (var i = 0; i < opList.length; i++)
+    opList[i].either(pq.remove.bind(pq), pq.add.bind(pq));
   return pq;
 }
 
 /** apply a sequence of operations ot an empty queue. */
 function buildQueue(opList) {
-  return applyOps(new PQueue(), opList);
+  return applyOps(new PQueue(C), opList);
 }
 
 /** Sort the array */
 function sort(a) {
-  return a.sort(Integers.cmp);
+  return a.sort(C.cmp);
 }
 
 /** Check a1 and a2 for equality as lists */
 function arrayEqOrdered(a1, a2) {
   if (a1.length != a2.length)
     return false;
-  for (var i in a1)
-    if (Integers.neq(a1[i], a2[i])) return false;
+  for (var i = 0; i < a1.length; i++)
+    if (C.neq(a1[i], a2[i])) return false;
   return true;
 }
 
@@ -41,7 +41,7 @@ function arrayEqUnordered(a1, a2) {
 
 /** Test that the given operation doesn't change a queue */
 function nonchanging(f) {
-  jsc.property(f.name + " doesn't change queue", "ops", function(ops) {
+  jsc.property(f.name + " doesn't change queue", "ops", env, function(ops) {
     var pq = buildQueue(ops);
     var before = pq.elements();
     f.call(pq);
@@ -49,7 +49,7 @@ function nonchanging(f) {
   });
 }
 
-describe("Priority Queue", function() {
+describe("Priority Queue: ", function() {
   // constr
   // add
   // remove
@@ -58,6 +58,8 @@ describe("Priority Queue", function() {
   // size
   // elements
   // invariant
+
+  console.log("hello");
 
   jsc.property("modifying elements preserves queue", "ops & array e", env, function(args) {
     var pq        = buildQueue(args[0]);
@@ -71,16 +73,18 @@ describe("Priority Queue", function() {
   });
 
   jsc.property("modifying queue preserves elements", "ops & ops", env, function(args) {
-    var pq = buildQueue(args[0]);
-    var oldElems = pq.elements().slice();
+    var pq    = buildQueue(args[0]);
+    var elems = pq.elements();
+    var copy  = elems.slice();
+
     applyOps(pq, args[1]);
 
-    return arrayEqUnordered(oldElems, pq.elements());
+    return arrayEqOrdered(elems, copy);
   });
 
   jsc.property("empty -> add* -> remove*", "array e", env, function(es) {
-    var pq = new PQueue();
-    for (var i in es)
+    var pq = new PQueue(C);
+    for (var i = 0; i < es.length; i++)
       pq.add(es[i]);
     var result = [];
     while (!pq.isEmpty())
@@ -89,7 +93,7 @@ describe("Priority Queue", function() {
     return arrayEqOrdered(sort(es), result);
   });
 
-  jsc.property("arb   -> add", "oplist & e", env, function(args) {
+  jsc.property("arb   -> add", "ops & e", env, function(args) {
     var pq = buildQueue(args[0]);
     var es = pq.elements().slice();
 
@@ -100,10 +104,10 @@ describe("Priority Queue", function() {
   });
 
   jsc.property("empty -> elements", function() {
-    return arrayEqOrdered(new PQueue().elements(), []);
+    return arrayEqOrdered(new PQueue(C).elements(), []);
   });
 
-  jsc.property("arb   -> remove*", "oplist", env, function(ops) {
+  jsc.property("arb   -> remove*", "ops", env, function(ops) {
     var pq   = buildQueue(ops);
     var orig = pq.elements().slice();
 
@@ -115,7 +119,7 @@ describe("Priority Queue", function() {
   });
 
   jsc.property("empty -> remove", function() {
-    var pq = new PQueue();
+    var pq = new PQueue(C);
     var result = pq.remove();
     return result == undefined && pq.isEmpty() && pq.invariant();
   });
@@ -126,7 +130,7 @@ describe("Priority Queue", function() {
   });
 
   jsc.property("empty -> isEmpty", function() {
-    return new PQueue().isEmpty();
+    return new PQueue(C).isEmpty();
   });
 
   jsc.property("arb   -> size", "ops", env, function(ops) {
@@ -139,19 +143,19 @@ describe("Priority Queue", function() {
   });
 
   jsc.property("empty -> invariant", function() {
-    return new PQueue().invariant();
+    return new PQueue(C).invariant();
   });
 
-  jsc.property("arb -> poll", "ops", function() {
+  jsc.property("arb -> poll", "ops", env, function(ops) {
     var pq = buildQueue(ops);
-    return arrayEqOrdered([pq.poll()], [pq.remove()]);
+    return pq.isEmpty() || C.eq(pq.poll(), pq.remove());
   });
 
-  nonchanging(poll);
-  nonchanging(isEmpty);
-  nonchanging(size);
-  nonchanging(elements);
-  nonchanging(invariant);
+  nonchanging(PQueue.prototype.poll);
+  nonchanging(PQueue.prototype.isEmpty);
+  nonchanging(PQueue.prototype.size);
+  nonchanging(PQueue.prototype.elements);
+  nonchanging(PQueue.prototype.invariant);
 });
 
 });

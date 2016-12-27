@@ -29,15 +29,15 @@ function PQueue(priorityOrder) {
 
 /** Add an element */
 PQueue.prototype.add = function(e) {
-  var i = impl.length;
-  impl.length = i + 1;
-  impl[i] = e;
+  var i = this.impl.length;
+  this.impl.length = i + 1;
+  this.impl[i] = e;
 
   // invariant: impl[i] == e
-  while (i != 0 && C.gt(impl[parent(i)], impl[i])) {
-    impl[i] = impl[parent(i)];
-    i = parent(i);
-    impl[i] = e;
+  while (i != 0 && this.C.gt(this.impl[par(i)], this.impl[i])) {
+    this.impl[i] = this.impl[par(i)];
+    i = par(i);
+    this.impl[i] = e;
   }
 };
 
@@ -45,19 +45,24 @@ PQueue.prototype.add = function(e) {
  *  if the queue is empty.
  */
 PQueue.prototype.remove = function() {
-  var result = impl[0];
+  if (this.impl.length == 0) return undefined;
 
-  var bubble = impl[impl.length-1];
-  impl.length = impl.length - 1;
+  var result = this.impl[0];
+
+  var bubble = this.impl[this.impl.length-1];
+  this.impl.length = this.impl.length - 1;
+
+  if (this.impl.length == 0) return result;
 
   // invariant: impl[i] = bubble
   var i   = 0;
-  impl[i] = bubble;
+  this.impl[i] = bubble;
   while (true) {
-    switch(C.minInd([impl[i],impl[left(i)],impl[right(i)]])) {
-      case 0: return;
-      case 1: impl[i] = impl[left(i)];  i = left(i);  impl[i] = bubble; break;
-      case 1: impl[i] = impl[right(i)]; i = right(i); impl[i] = bubble; break;
+    switch(this.C.minInd([this.impl[i],this.impl[left(i)],this.impl[right(i)]])) {
+      case 0: return result;
+      case 1: this.impl[i] = this.impl[left(i)];  i = left(i);  this.impl[i] = bubble; break;
+      case 2: this.impl[i] = this.impl[right(i)]; i = right(i); this.impl[i] = bubble; break;
+      default: throw new Error("this shouldn't happen");
     }
   }
 };
@@ -69,26 +74,28 @@ PQueue.prototype.poll = function() {
 
 /** Return true if the queue is empty */
 PQueue.prototype.isEmpty = function() {
-  return impl.length == 0;
+  return this.impl.length == 0;
 };
 
 /** Return the number of elements in the queue */
 PQueue.prototype.size = function() {
-  return impl.length;
+  return this.impl.length;
 };
 
 /** Return the elements in an unspecified order. */
 PQueue.prototype.elements = function() {
-  return impl.slice();
+  return this.impl.slice();
 };
 
 /** Return true if this satisfies its invariants. */
 PQueue.prototype.invariant = function() {
-  for (var i in this.impl)
-    if (C.minInd(impl[i], impl[left(i)], impl[right(i)]) != 0)
+  for (var i = 0; i < this.impl.length; i++)
+    if (this.C.minInd([this.impl[i], this.impl[left(i)], this.impl[right(i)]]) != 0)
       return false;
   return true;
 };
+
+return PQueue;
 
 });
 
