@@ -10,8 +10,8 @@ describe("Integers satisfy", function() {
   properties.orderedRingProperties(integers);
 });
 
-describe("Floats satisfy", function() {
-  properties.orderedFieldProperties(floats);
-});
+//describe("Floats satisfy", function() {
+//  properties.orderedFieldProperties(floats);
+//});
 
 });

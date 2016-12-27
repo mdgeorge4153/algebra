@@ -20,7 +20,7 @@ requirejs.onError = function(err) {
 }
 
 require(['jasmine/boot'], function() {
-  require([//'spec/numbers',
+  require(['spec/numbers',
            'spec/pQueue.spec'
           ], function(module){
     // note: jsverify is trying to access "process", which seems to be defined
