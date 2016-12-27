@@ -2,5 +2,4 @@
  - rename spec -> test
  - ensure that pqueue test / arbitrary operation list produces large queues
  - enhance traits so that types are included; add property tests to ensure types of functions
- - figure out jsverify/jasmine integration to get rid of "no expectation" errors
 

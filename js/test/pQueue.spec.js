@@ -1,5 +1,5 @@
-define(["pQueue", "numbers/integers", "lib/jsverify"],
-function(PQueue,   C,                jsc) {
+define(["pQueue", "numbers/integers", "lib/jsverify", "propertyWrapper"],
+function(PQueue,   C,                  jsc,            property) {
 
 /** A jsc environment for constructing test cases */
 var env = {
@@ -41,7 +41,7 @@ function arrayEqUnordered(a1, a2) {
 
 /** Test that the given operation doesn't change a queue */
 function nonchanging(f) {
-  jsc.property(f.name + " doesn't change queue", "ops", env, function(ops) {
+  property(f.name + " doesn't change queue", "ops", env, function(ops) {
     var pq = buildQueue(ops);
     var before = pq.elements();
     f.call(pq);
@@ -61,7 +61,7 @@ describe("Priority Queue: ", function() {
 
   console.log("hello");
 
-  jsc.property("modifying elements preserves queue", "ops & array e", env, function(args) {
+  property("modifying elements preserves queue", "ops & array e", env, function(args) {
     var pq        = buildQueue(args[0]);
     var elems     = pq.elements();
     var elemsCopy = pq.elements().slice();
@@ -72,7 +72,7 @@ describe("Priority Queue: ", function() {
     return arrayEqUnordered(pq.elements(), elemsCopy);
   });
 
-  jsc.property("modifying queue preserves elements", "ops & ops", env, function(args) {
+  property("modifying queue preserves elements", "ops & ops", env, function(args) {
     var pq    = buildQueue(args[0]);
     var elems = pq.elements();
     var copy  = elems.slice();
@@ -82,7 +82,7 @@ describe("Priority Queue: ", function() {
     return arrayEqOrdered(elems, copy);
   });
 
-  jsc.property("empty -> add* -> remove*", "array e", env, function(es) {
+  property("empty -> add* -> remove*", "array e", env, function(es) {
     var pq = new PQueue(C);
     for (var i = 0; i < es.length; i++)
       pq.add(es[i]);
@@ -93,7 +93,7 @@ describe("Priority Queue: ", function() {
     return arrayEqOrdered(sort(es), result);
   });
 
-  jsc.property("arb   -> add", "ops & e", env, function(args) {
+  property("arb   -> add", "ops & e", env, function(args) {
     var pq = buildQueue(args[0]);
     var es = pq.elements().slice();
 
@@ -103,11 +103,11 @@ describe("Priority Queue: ", function() {
     return arrayEqUnordered(es, pq.elements());
   });
 
-  jsc.property("empty -> elements", function() {
+  property("empty -> elements", function() {
     return arrayEqOrdered(new PQueue(C).elements(), []);
   });
 
-  jsc.property("arb   -> remove*", "ops", env, function(ops) {
+  property("arb   -> remove*", "ops", env, function(ops) {
     var pq   = buildQueue(ops);
     var orig = pq.elements().slice();
 
@@ -118,35 +118,35 @@ describe("Priority Queue: ", function() {
     return arrayEqOrdered(sort(orig), result);
   });
 
-  jsc.property("empty -> remove", function() {
+  property("empty -> remove", function() {
     var pq = new PQueue(C);
     var result = pq.remove();
     return result == undefined && pq.isEmpty() && pq.invariant();
   });
 
-  jsc.property("arb   -> isEmpty", "ops", env, function(ops) {
+  property("arb   -> isEmpty", "ops", env, function(ops) {
     var pq = buildQueue(ops);
     return pq.isEmpty() == arrayEqOrdered(pq.elements(), []);
   });
 
-  jsc.property("empty -> isEmpty", function() {
+  property("empty -> isEmpty", function() {
     return new PQueue(C).isEmpty();
   });
 
-  jsc.property("arb   -> size", "ops", env, function(ops) {
+  property("arb   -> size", "ops", env, function(ops) {
     var pq = buildQueue(ops);
     return pq.size() == pq.elements().length;
   });
 
-  jsc.property("arb   -> invariant", "ops", env, function(ops) {
+  property("arb   -> invariant", "ops", env, function(ops) {
     return buildQueue(ops).invariant();
   });
 
-  jsc.property("empty -> invariant", function() {
+  property("empty -> invariant", function() {
     return new PQueue(C).invariant();
   });
 
-  jsc.property("arb -> poll", "ops", env, function(ops) {
+  property("arb -> poll", "ops", env, function(ops) {
     var pq = buildQueue(ops);
     return pq.isEmpty() || C.eq(pq.poll(), pq.remove());
   });
