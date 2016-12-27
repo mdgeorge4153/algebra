@@ -1,0 +1,4 @@
+ - use classes?
+ - rename spec -> test
+ - ensure that pqueue test / arbitrary operation list produces large queues
+
