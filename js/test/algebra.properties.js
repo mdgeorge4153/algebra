@@ -413,7 +413,7 @@ exports.orderedEuclideanRingProperties = function(oer) {
 /******************************************************************************/
 
 exports.orderedFieldProperties = function(of) {
-  exports.orderedRingProperties(of);
+  exports.orderedEuclideanRingProperties(of);
   exports.fieldProperties(of);
 
   describe("ordered field properties", function () {
