@@ -8,6 +8,18 @@ var env = {
   "empty" : jsc.unit.smap
 };
 
+/** apply a sequence of operations to the given queue and return it. */
+function applyOps(pq, opList) {
+  for (var i in opList)
+    opList[i].either(pq.remove, pq.add);
+  return pq;
+}
+
+/** apply a sequence of operations ot an empty queue. */
+function buildQueue(opList) {
+  return applyOps(new PQueue(), opList);
+}
+
 /** Sort the array */
 function sort(a) {
   return a.sort(Integers.cmp);
@@ -25,18 +37,6 @@ function arrayEqOrdered(a1, a2) {
 /** Check a1 and a2 for equality as multisets */
 function arrayEqUnordered(a1, a2) {
   return arrayEqOrdered(sort(a1), sort(a2));
-}
-
-/** apply a sequence of operations to the given queue and return it. */
-function applyOps(pq, opList) {
-  for (var i in opList)
-    opList[i].either(pq.remove, pq.add);
-  return pq;
-}
-
-/** apply a sequence of operations ot an empty queue. */
-function buildQueue(opList) {
-  return applyOps(new PQueue(), opList);
 }
 
 /** Test that the given operation doesn't change a queue */
