@@ -59,8 +59,6 @@ describe("Priority Queue: ", function() {
   // elements
   // invariant
 
-  console.log("hello");
-
   property("modifying elements preserves queue", "ops & array e", env, function(args) {
     var pq        = buildQueue(args[0]);
     var elems     = pq.elements();
