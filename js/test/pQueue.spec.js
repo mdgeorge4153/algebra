@@ -1,4 +1,4 @@
-define(["pQueue", "numbers/floats", "lib/jsverify"],
+define(["pQueue", "numbers/integers", "lib/jsverify"],
 function(PQueue,   C,                jsc) {
 
 /** A jsc environment for constructing test cases */
