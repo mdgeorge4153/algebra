@@ -1,4 +1,4 @@
-define(["lib/jsverify", "algebra", "propertyWrapper"],
+define(["lib/jsverify", "algebra", "test/propertyWrapper"],
 function(jsc,            Algebra,   property) {
 
 var exports = {};

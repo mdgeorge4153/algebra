@@ -1,4 +1,4 @@
-define(["pQueue", "numbers/integers", "lib/jsverify", "propertyWrapper"],
+define(["pQueue", "numbers/integers", "lib/jsverify", "test/propertyWrapper"],
 function(PQueue,   C,                  jsc,            property) {
 
 /** A jsc environment for constructing test cases */

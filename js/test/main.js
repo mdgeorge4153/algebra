@@ -3,7 +3,7 @@ requirejs.config(
     baseUrl:'src/',
     paths:{
       'lib':'../lib',
-      'spec':'../test',
+      'test':'../test',
       'jasmine':'../lib/jasmine-2.5.2'
     },
     shim:{
@@ -20,8 +20,8 @@ requirejs.onError = function(err) {
 }
 
 require(['jasmine/boot'], function() {
-  require(['spec/numbers',
-           'spec/pQueue.spec'
+  require(['test/numbers.spec',
+           'test/pQueue.spec'
           ], function(module){
     // note: jsverify is trying to access "process", which seems to be defined
     // incorrectly by someone or other.

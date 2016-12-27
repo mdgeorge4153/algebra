@@ -1,4 +1,4 @@
-define(["algebra.properties", "lib/jsverify",
+define(["test/algebra.properties", "lib/jsverify",
         "numbers/integers",
         "numbers/floats"],
 function(properties, jsc,
