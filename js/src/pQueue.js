@@ -5,15 +5,15 @@
 define([],
 function() {
 
-var left = function(i) {
+function left(i) {
   return 2*i+1;
 }
 
-var right = function(i) {
+function right(i) {
   return 2*i + 2;
 }
 
-var par = function(i) {
+function par(i) {
   return Math.floor((i-1)/2);
 }
 
@@ -28,7 +28,7 @@ function PQueue(priorityOrder) {
 };
 
 /** Add an element */
-PQueue.prototype.add = function(e) {
+PQueue.prototype.add = function add(e) {
   var i = this.impl.length;
   this.impl.length = i + 1;
   this.impl[i] = e;
@@ -44,7 +44,7 @@ PQueue.prototype.add = function(e) {
 /** Remove and return the element with the minimum priority.  Returns undefined
  *  if the queue is empty.
  */
-PQueue.prototype.remove = function() {
+PQueue.prototype.remove = function remove() {
   if (this.impl.length == 0) return undefined;
 
   var result = this.impl[0];
@@ -68,27 +68,27 @@ PQueue.prototype.remove = function() {
 };
 
 /** Return smallest priority element, or undefined if the queue is empty */
-PQueue.prototype.poll = function() {
+PQueue.prototype.poll = function poll() {
   return this.impl[0];
 };
 
 /** Return true if the queue is empty */
-PQueue.prototype.isEmpty = function() {
+PQueue.prototype.isEmpty = function isEmpty() {
   return this.impl.length == 0;
 };
 
 /** Return the number of elements in the queue */
-PQueue.prototype.size = function() {
+PQueue.prototype.size = function size() {
   return this.impl.length;
 };
 
 /** Return the elements in an unspecified order. */
-PQueue.prototype.elements = function() {
+PQueue.prototype.elements = function elements() {
   return this.impl.slice();
 };
 
 /** Return true if this satisfies its invariants. */
-PQueue.prototype.invariant = function() {
+PQueue.prototype.invariant = function invariant() {
   for (var i = 0; i < this.impl.length; i++)
     if (this.C.minInd([this.impl[i], this.impl[left(i)], this.impl[right(i)]]) != 0)
       return false;
