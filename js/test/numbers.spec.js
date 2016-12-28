@@ -12,6 +12,7 @@ function(properties, jsc,
 
 var V = numbers.V;
 var F = numbers.F;
+var M = numbers.M;
 
 //describe("Integers satisfy", function() {
 //  properties.orderedEuclideanRingProperties(integers);
@@ -27,6 +28,10 @@ var F = numbers.F;
 
 describe("Vectors satisfy", function() {
   properties.innerProductSpaceProperties(V);
+});
+
+describe("Matrices satisfy", function() {
+  properties.associativeAlgebraProperties(M);
 });
 
 });
