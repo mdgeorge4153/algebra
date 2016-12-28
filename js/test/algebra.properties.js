@@ -26,18 +26,9 @@ function hasType(set, result, type) {
   else
     result = typeof result == type;
 
-  if (!result)
-    console.log("hasType(" + set + ", " + result + ", " + type + ") returns false");
-
   return result;
 }
   
-function flip(f) {
-  var result = function(a,b) { return f(b,a); };
-  result.name = "flip(" + f.name + ")";
-  return result;
-}
-
 /** Generalized properties ****************************************************/
 
 function reflexive(set, op) {
@@ -459,17 +450,24 @@ exports.moduleProperties = function(m) {
 
     hasFunctionType(m, m.smult, "s & e", "e");
 
-    distributesOver(m, m.smult, m.plus, "s & e & e");
-    distributesOver(m, flip(m.smult), m.scalar.plus, "e & s & s");
+    property("scalar multiplication distributes over vector plus", "s & e & e", env(m), function(args) {
+      return m.eq(m.smult(args[0], m.plus(args[1],args[2]))
+                 ,m.plus(m.smult(args[0], args[1]), m.smult(args[0], args[2])));
+    });
+
+    property("scalar multiplication distributes over scalar plus", "s & s & e", env(m), function(args) {
+      return m.eq(m.smult(m.scalars.plus(args[0], args[1]), args[2])
+                 ,m.plus(m.smult(args[0], args[2]), m.smult(args[1], args[2])));
+    });
 
     property("scalar multiplication is associative", "s & s & e", env(m), function(e) {
-      return m.eq(m.smult(m.scalar.times(e[0],e[1]), e[2])
+      return m.eq(m.smult(m.scalars.times(e[0],e[1]), e[2])
                  ,m.smult(e[0], m.smult(e[1], e[2])));
     });
 
     hasIdentity(m, m.smult, m.scalars.one);
 
-    property("sdiv works", "e & s", function (e) {
+    property("sdiv works", "e & s", env(m), function (e) {
       return m.scalars.isUnit(e[1])
 	   ? m.eq(m.sdiv(e[0],e[1]), m.smult(m.scalars.inv(e[1]), e[0]))
 	   : true;
@@ -491,23 +489,29 @@ exports.vectorSpaceProperties = function(v) {
 
 /******************************************************************************/
 
-exports.innerSpaceProperties = function(v) {
+exports.innerProductSpaceProperties = function(v) {
   exports.vectorSpaceProperties(v);
 
   describe("inner product properties:", function() {
     describe("scalars satisfy", function() {
-      exports.orderedFieldProperties(v);
+      //exports.orderedFieldProperties(v);
     });
 
     commutative(v, v.dot, v.scalars.eq);
-    distributesOver(v, v.dot, v.plus, "e & e & e", v.scalars.eq);
 
     property("dot is linear", "s & e & e", env(v), function(e) {
-      return v.scalars.eq(v.dot(v.smult(e[0], e[1]), e[2])
-                         ,v.smult(e[0], v.dot(e[0], e[1])));
+      var a = e[0], x = e[1], y = e[2];
+      return v.scalars.eq(v.dot(v.smult(a, x), y)
+			 ,v.scalars.times(a, v.dot(x, y)));
     });
 
-    property("dot is positive definite", "e", function(e) {
+    property("dot distributes over vector plus", "e & e & e", env(v), function(e) {
+      var x = e[0], y = e[1], z = e[2];
+      return v.scalars.eq(v.dot(v.plus(x, y), z)
+                         ,v.scalars.plus(v.dot(x,z), v.dot(y,z)));
+    });
+
+    property("dot is positive definite", "e", env(v), function(e) {
       return v.scalars.isNonNeg(v.dot(e,e)) &&
              v.scalars.isZero(v.dot(e,e)) == v.isZero(e);
     });

@@ -1,23 +1,32 @@
 define(["test/algebra.properties", "lib/jsverify",
         "numbers/integers",
         "numbers/floats",
-        "numbers/rationals"],
+        "numbers/rationals",
+        "numbers"],
 function(properties, jsc,
          integers,
          floats,
-         rationals)
+         rationals,
+         numbers)
 {
 
-describe("Integers satisfy", function() {
-  properties.orderedEuclideanRingProperties(integers);
-});
+var V = numbers.V;
+var F = numbers.F;
+
+//describe("Integers satisfy", function() {
+//  properties.orderedEuclideanRingProperties(integers);
+//});
 
 //describe("Floats satisfy", function() {
 //   properties.orderedFieldProperties(floats);
+//})
+
+//describe("Rationals satisfy", function() {
+//  properties.orderedFieldProperties(rationals);
 //});
 
-describe("Rationals satisfy", function() {
-  properties.orderedFieldProperties(rationals);
+describe("Vectors satisfy", function() {
+  properties.innerProductSpaceProperties(V);
 });
 
 });

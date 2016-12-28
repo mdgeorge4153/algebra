@@ -19,6 +19,8 @@ requirejs.onError = function(err) {
   throw err;
 }
 
+Error.stackTraceLimit=100;
+
 require(['jasmine/boot'], function() {
   require(['test/numbers.spec',
            'test/pQueue.spec'
