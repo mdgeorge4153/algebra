@@ -5,4 +5,6 @@
  - finish euclidean domain stuff
  - avoid duplicate tests
  - make sure arbitrary integer returns large things
+ - improve parsing and pretty printing
+ - perhaps unify vector, scalar, matrix into tensor
 
