@@ -3,13 +3,18 @@ function(Algebra,   BigInteger, Traits, jsc) {
 
 var ints = {};
 
-var arbBigint = jsc.integer.smap(
+// TODO: changing int16 to integer causes stack overflow
+var arbBigint = jsc.int16.smap(
   function(n) {
-    return BigInteger(n);
+    try {
+      return BigInteger(n);
+    } catch(err) {
+      console.log(n); throw err;
+    }
   },
 
   function(i) {
-    return i.toJSValue();
+    return i.toJSValue() - 1;
   },
 
   function(i) {
