@@ -84,24 +84,24 @@ if (R.leq != undefined) {
   };
 }
 
-this.plus = function (a,b) {
+this.plus = function plus(a,b) {
   return create(R.plus(R.times(a.num, b.den), R.times(a.den, b.num)),
                 R.times(a.den, b.den));
 };
 
 this.zero = create(R.zero, R.one);
 
-this.neg = function (a) {
+this.neg = function neg(a) {
   return create(R.neg(a.num), a.den);
 };
 
-this.times = function (a,b) {
+this.times = function times(a,b) {
   return create(R.times(a.num, b.num), R.times(a.den,b.den));
 };
 
 this.one = create(R.one, R.one);
 
-this.inv = function (a) {
+this.inv = function inv(a) {
   return create(a.den, a.num);
 };
 
@@ -111,19 +111,21 @@ if (R.toNumber != undefined) {
   };
 }
 
-this.fromRingElems = function (a,b) {
-  return new Fraction(a,b);
-};
+/** Optimizations *************************************************************/
 
-this.fromInts = function (n1,n2) {
-  return create(R.fromInt(n1), R.fromInt(n2));
-};
-
-this.fromInt = function (n) {
+this.fromInt = function fromInt(n) {
   return create(R.fromInt(n), R.one);
 };
 
-/** Optimizations *************************************************************/
+/** only for fractions ********************************************************/
+
+this.fromRingElems = function fromRingElems(a,b) {
+  return new Fraction(a,b);
+};
+
+this.fromInts = function fromInts(n1,n2) {
+  return create(R.fromInt(n1), R.fromInt(n2));
+};
 
 };
 
