@@ -511,6 +511,8 @@ exports.innerSpaceProperties = function(v) {
       return v.scalars.isNonNeg(v.dot(e,e)) &&
              v.scalars.isZero(v.dot(e,e)) == v.isZero(e);
     });
+
+    isEquivalentTo(v, v.norm2, "e", "s", Algebra.InnerProductSpace.norm2.value.bind(v));
   });
 };
 
