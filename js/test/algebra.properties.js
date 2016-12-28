@@ -325,6 +325,9 @@ exports.euclideanRingProperties = function(ring) {
   exports.commutativeRingProperties(ring);
 
   describe("euclidean ring properties:", function() {
+
+    // TODO: divmod spec
+
     property("a = quot(a,b)b + rem(a,b)", "e & e", env(ring), function (e) {
       return ring.isNonZero(e[1])
            ? ring.eq(e[0], ring.plus(ring.times(ring.quot(e[0],e[1]), e[1]), ring.rem(e[0],e[1])))
@@ -338,7 +341,7 @@ exports.euclideanRingProperties = function(ring) {
       return ring.isNonZero(r) ? ring.degree(r) < ring.degree(e[1]) : true;
     });
 
-    property("degree is monotonic", "e & e", env(ring), function (e) {
+    property("multiplication is monotonic in degree", "e & e", env(ring), function (e) {
       return ring.isNonZero(e[0]) && ring.isNonZero(e[1])
            ? ring.degree(e[0]) <= ring.degree(ring.times(e[0],e[1]))
            : true;
@@ -346,27 +349,29 @@ exports.euclideanRingProperties = function(ring) {
 
     property("gcd is a common divisor", "e & e", env(ring), function (e) {
       var g = ring.gcd(e[0], e[1]);
-      throw new Error("TODO: not sure how to tell if g | e0 in arb. euclidean domain");
+      return ring.divides(g, e[0]) && ring.divides(g,e[1]);
     });
 
-    property("gcd is the greatest divisor", "e & e & e", env(ring), function (e) {
-      throw new Error("TODO");
+    // TODO: this test unlikely to hit common divisors
+    property("all common divisors divide gcd", "e & e & e", env(ring), function (e) {
+      var g = ring.gcd(e[0], e[1]);
+      return ring.divides(e[2], e[0]) && ring.divides(e[2], e[1])
+           ? ring.divides(e[2], g)
+           : true;
     });
+
+    property("divMod matches quot and rem", "e & e", env(ring), function(e) {
+      if (ring.isZero(e[1])) return true;
+      var d = ring.divMod(e[0], e[1]);
+      return ring.eq(ring.quot(e[0],e[1]), d[0]) && ring.eq(ring.rem(e[0],e[1]), d[1]);
+    });
+
+    isEquivalentTo(ring, ring.divides, "e & e", "boolean", Algebra.EuclideanRing.divides.value.bind(ring));
 
     property("bezout coefficients correct", "e & e", env(ring), function(e) {
       var c = ring.bezout(e[0], e[1]);
       return ring.eq(ring.gcd(e[0],e[1]),
                      ring.plus(ring.times(c[0], e[0]), ring.times(c[1], e[1])));
-    });
-
-    property("reduce preserves quotient", "e & e", env(ring), function(e) {
-      if (ring.isZero(e[1])) return true;
-      var f = ring.reduce(e[0], e[1]);
-      return ring.eq(ring.times(e[0], f[1]), ring.times(f[0], e[1]));
-    });
-
-    it("has enough euclidean domain tests", function() {
-      expect(false).toBe(true);
     });
 
   });

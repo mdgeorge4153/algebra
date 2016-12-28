@@ -80,10 +80,11 @@ exports.EuclideanRing = Traits.compose(exports.CommutativeRing, Traits({
   divMod:     /** E, E   -> E, E   */ Traits.required,
   degree:     /** E      -> nat    */ Traits.required,
 
-  gcd:        /** E, E   -> E      */ function gcd(a,b)    { return gcdImpl.call(this, a, b); },
+  gcd:        /** E, E   -> E      */ function gcd(a,b)     { return gcdImpl.call(this, a, b); },
 
-  quot:       /** E, E   -> E      */ function quot(a,b)   { return this.divMod(a,b)[0]; },
-  rem:        /** E, E   -> E      */ function quot(a,b)   { return this.divMod(a,b)[1]; },
+  quot:       /** E, E   -> E      */ function quot(a,b)    { return this.divMod(a,b)[0]; },
+  rem:        /** E, E   -> E      */ function rem(a,b)     { return this.divMod(a,b)[1]; },
+  divides:    /** E, E   -> bool   */ function divides(a,b) { return this.isZero(a) ? this.isZero(b) : this.isZero(this.rem(b,a)); },
 
   /** return [s,t] such that gcd(a,b) = s*a + t*b */
   bezout:     /** E, E   -> E, E   */ function bezout(a,b) { return bezoutImpl.call(this, a, b); },
@@ -96,7 +97,6 @@ exports.Field = Traits.override(Traits({
 
   gcd:        /** E, E   -> E      */ function gcd(a,b)  { return this.one; /* TODO? */ },
   bezout:     /** E, E   -> E      */ function bezout(a,b) { return [this.zero, this.inv(b)]; },
-  reduce:     /** E, E   -> E, E   */ function reduce(a,b) { return [a,b]; },
 }), exports.EuclideanRing);
 
 exports.OrderedRing = Traits.compose(exports.CommutativeRing, exports.TotalOrder, Trait({
@@ -161,14 +161,14 @@ maxIndImpl = function maxIndImpl(es) {
 
 /** @see EuclideanRing.gcd */
 gcdImpl = function gcdImpl(a,b) {
-  // gcd(a,0) = a
+  // gcd(a,0) = |a|
   // gcd(a,b) = gcd(b,r) where a = qb+r
   while (this.isNonZero(b)) {
     var t = b;
     b = this.rem(a, b);
     a = t;
   }
-  return this.isNeg(a) ? this.neg(a) : a;
+  return this.abs(a);
 };
 
 /** @see EuclideanRing.bezout */
@@ -180,12 +180,12 @@ bezoutImpl = function bezoutImpl(a,b) {
   //          = t'a + (s'-t'q)b  by algebra
 
   if (this.isZero(b))
-    return [this.one, this.zero];
+    return [this.sign(a), this.zero];
 
   var divMod = this.divMod(a, b);
   var q = divMod[0], r = divMod[1];
 
-  var brCoeffs = bezoutImpl(b,r);
+  var brCoeffs = bezoutImpl.call(this, b,r);
   var sPrime = brCoeffs[0], tPrime = brCoeffs[1];
 
   return [tPrime, this.minus(sPrime, this.times(tPrime,q))];

@@ -27,7 +27,7 @@ ints.one        = BigInteger.ONE;
 ints.plus       = function plus(a,b)       { return BigInteger.add(a,b); };
 ints.neg        = function neg(a)          { return BigInteger.negate(a); };
 ints.times      = function times(a,b)      { return BigInteger.multiply(a,b); };
-ints.divMod     = function divMod(a,b)     { return BigInteger.divMod(a,b); };
+ints.divMod     = function divMod(a,b)     { return BigInteger.divRem(a,b); };
 
 ints.leq        = function leq      (a,b) { return BigInteger.compare(a,b) <= 0; };
 ints.toNumber   = function toNumber (a)   { return a.toJSValue(); };

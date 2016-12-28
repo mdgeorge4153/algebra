@@ -13,7 +13,7 @@ describe("Integers satisfy", function() {
 });
 
 //describe("Floats satisfy", function() {
-//  properties.orderedFieldProperties(floats);
+//   properties.orderedFieldProperties(floats);
 //});
 
 describe("Rationals satisfy", function() {
