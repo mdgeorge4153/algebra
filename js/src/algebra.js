@@ -116,7 +116,7 @@ exports.OrderedField = Traits.compose(exports.OrderedRing, exports.Field, Traits
 /** Vectors *******************************************************************/
 
 exports.Module = Traits.compose(exports.Group, Traits({
-  scalars:    /** OrderedRing      */ Traits.required,
+  scalars:    /** CommutativeRing  */ Traits.required,
   smult:      /** S, E   -> E      */ Traits.required,
   sdiv:       /** E, S   -> E      */ function sdiv(v,s)  { return this.smult(this.scalars.inv(s), v); }
 }));
@@ -127,6 +127,10 @@ exports.InnerProductSpace = Traits.compose(exports.VectorSpace, Traits({
   dot:        /** E, E   -> S      */ Traits.required,
   norm2:      /** E      -> S      */ function norm2(v) { return this.dot(v,v); }
 }));
+
+/** Matrices ******************************************************************/
+
+exports.AssociativeAlgebra = Traits.compose(exports.Module, exports.Ring)
 
 /** Implementations ***********************************************************/
 

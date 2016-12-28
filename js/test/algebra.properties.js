@@ -32,6 +32,11 @@ function hasType(set, result, type) {
   return result;
 }
   
+function flip(f) {
+  var result = function(a,b) { return f(b,a); };
+  result.name = "flip(" + f.name + ")";
+  return result;
+}
 
 /** Generalized properties ****************************************************/
 
@@ -112,7 +117,7 @@ function associative(set, op) {
 
 function hasIdentity(set, op, id) {
   property(name(op) + " has identity", "e", env(set), function(e) {
-    return set.eq(e, op(e, id)) && set.eq(e, op(id, e));
+    return set.eq(e, op(id, e));
   });
 }
 
@@ -122,9 +127,10 @@ function hasInverse(set, op, inv, id) {
   });
 }
 
-function commutative(set, op) {
+function commutative(set, op, eq) {
+  if (eq == undefined) eq = set.eq;
   property(name(op) + " is commutative", "e & e", env(set), function(e) {
-    return set.eq(op(e[0],e[1]), op(e[1],e[0]));
+    return eq(op(e[0],e[1]), op(e[1],e[0]));
   });
 }
 
@@ -135,9 +141,12 @@ function hasInverseIf(set, op, inv, id, condition) {
   });
 }
 
-function distributesOver(set, op1, op2) {
-  property(name(op1) + " distributes over " + name(op2), "e & e & e", env(set), function(e) {
-    return set.eq(op1(e[0], op2(e[1], e[2])), op2(op1(e[0], e[1]), op1(e[0], e[2])));
+function distributesOver(set, op1, op2, type, eq) {
+  if (type == undefined) type = "e & e & e";
+  if (eq   == undefined) eq   = set.eq;
+
+  property(name(op1) + " distributes over " + name(op2), type, env(set), function(e) {
+    return eq(op1(e[0], op2(e[1], e[2])), op2(op1(e[0], e[1]), op1(e[0], e[2])));
   });
 }
 
@@ -421,7 +430,7 @@ exports.orderedFieldProperties = function(of) {
   exports.orderedEuclideanRingProperties(of);
   exports.fieldProperties(of);
 
-  describe("ordered field properties", function () {
+  describe("ordered field properties:", function () {
     hasFunctionType(of, of.toNumber, "e", "number");
 
     property("one is 1", function() {
@@ -439,6 +448,87 @@ exports.orderedFieldProperties = function(of) {
 }
 
 /******************************************************************************/
+
+exports.moduleProperties = function(m) {
+  exports.groupProperties(m);
+
+  describe("module properties:", function () {
+    describe("scalars satisfy", function() {
+      exports.ringProperties(m.scalars);
+    });
+
+    hasFunctionType(m, m.smult, "s & e", "e");
+
+    distributesOver(m, m.smult, m.plus, "s & e & e");
+    distributesOver(m, flip(m.smult), m.scalar.plus, "e & s & s");
+
+    property("scalar multiplication is associative", "s & s & e", env(m), function(e) {
+      return m.eq(m.smult(m.scalar.times(e[0],e[1]), e[2])
+                 ,m.smult(e[0], m.smult(e[1], e[2])));
+    });
+
+    hasIdentity(m, m.smult, m.scalars.one);
+
+    property("sdiv works", "e & s", function (e) {
+      return m.scalars.isUnit(e[1])
+	   ? m.eq(m.sdiv(e[0],e[1]), m.smult(m.scalars.inv(e[1]), e[0]))
+	   : true;
+    });
+  });
+};
+
+/******************************************************************************/
+
+exports.vectorSpaceProperties = function(v) {
+  exports.moduleProperties(v);
+
+  describe("vector space properties:", function() {
+    describe("scalars satisfy", function() {
+      exports.fieldProperties(v.scalars);
+    });
+  });
+};
+
+/******************************************************************************/
+
+exports.innerSpaceProperties = function(v) {
+  exports.vectorSpaceProperties(v);
+
+  describe("inner product properties:", function() {
+    describe("scalars satisfy", function() {
+      exports.orderedFieldProperties(v);
+    });
+
+    commutative(v, v.dot, v.scalars.eq);
+    distributesOver(v, v.dot, v.plus, "e & e & e", v.scalars.eq);
+
+    property("dot is linear", "s & e & e", env(v), function(e) {
+      return v.scalars.eq(v.dot(v.smult(e[0], e[1]), e[2])
+                         ,v.smult(e[0], v.dot(e[0], e[1])));
+    });
+
+    property("dot is positive definite", "e", function(e) {
+      return v.scalars.isNonNeg(v.dot(e,e)) &&
+             v.scalars.isZero(v.dot(e,e)) == v.isZero(e);
+    });
+  });
+};
+
+/******************************************************************************/
+
+exports.associativeAlgebraProperties = function(m) {
+  exports.moduleProperties(m);
+  exports.ringProperties(m);
+
+  describe("associative algebra properties:", function() {
+    property("scalar multiplication and algebra multiplication are compatible", "s & e & e", env(m), function(e) {
+      var e1 = m.smult(e[0], m.times(e[1], e[2]));
+      var e2 = m.times(m.smult(e[0], e[1]), e[2]);
+      var e3 = m.times(e[1], m.smult(e[0],e[2]));
+      return m.eq(e1, e2) && m.eq(e2, e3);
+    });
+  });
+};
 
 return exports;
 
