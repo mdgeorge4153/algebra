@@ -292,9 +292,46 @@ R.merge = function merge(r) {
 
 /** union *********************************************************************/
 
+/**
+ * @typedef Event @type {object}
+ * @property {Vector} position
+ */
+
+/** @constructor */
+function Event(vertex) {
+  this.position = vertex.pos;
+};
+
+var eventPO;
+
+function Boundary() {
+  throw new Error("Not Implemented");
+}
+
+var boundaryPO;
+
 /** union the two regions */
 R.union = function union(r1, r2) {
-  throw new Error("Not Implemented");
+  var worklist = new util.PrioritySet(eventPO.cmp);
+
+  for (var i in r1) {
+    var ev = worklist.findOrAdd(new Event(r1.pos));
+    ev.addV1(v1);
+  }
+  for (var i in r2)
+    var ev = worklist.findOrAdd(new Event(r2.pos));
+    ev.addV2(v2);
+  }
+
+  var sweepLine = new buckets.BSTree(boundaryPO.compare);
+  var result = [];
+
+  while(!worklist.isEmpty()) {
+    var ev = worklist.dequeue();
+    throw new Error("Not Implemented");
+  }
+
+  return result;
 };
 
 /******************************************************************************/
