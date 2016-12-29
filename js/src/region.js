@@ -37,11 +37,6 @@ var INSIDE = 1, BOUNDARY = 0, OUTSIDE = -1;
  *                                 boundary.
  */
 
-var arbVert = V.arbitrary.smap(
-  function(vect) { return {pos: vect, edges: [], isolated: BOUNDARY}; },
-  function(vert) { return vert.pos; }
-);
-
 /**
  * @typedef Edge
  * @type {object}
@@ -51,8 +46,6 @@ var arbVert = V.arbitrary.smap(
  *                               towards dst) is inside the region
  * @property {boolean} rightIn - similar to leftIn
  */
-
-var arbEdge = jsc.compile("{pos: vert, leftIn: bool, rightIn: bool}", {vert: arbVert});
 
 /** functions */
 
@@ -77,6 +70,42 @@ var arbEdge = jsc.compile("{pos: vert, leftIn: bool, rightIn: bool}", {vert: arb
 /* compile : Region -> Query */
 /* contains : Query, Vector -> Location */
 
+/** Partial orders ************************************************************/
+
+var arbVert = V.arbitrary.smap(
+  function(vect) { return {pos: vect, edges: [], isolated: BOUNDARY}; },
+  function(vert) { return vert.pos; }
+);
+
+var arbEdge = jsc.compile("{pos: vert, leftIn: bool, rightIn: bool}", {vert: arbVert});
+
+/** compare vertices lexicographically by position */
+var vertPO = {
+  eq:         function eq(v1, v2)    { return V.eq(v1.pos, v2.pos); },
+  arbitrary:  arbVert,
+  isInstance: function isInstance(v) { return V.isInstance(v.pos); },
+  ofString:   function ofString(s)   { return V.ofString(s); },
+  stringOf:   function stringOf(v)   { return V.stringOf(v); },
+  leq:        function leq(v1, v2)   { return V.lt(v1.x, v2.x)
+					   || V.eq(v1.x, v2.x) && V.leq(v1.y, v2.y); }
+};
+
+/** compare edges by slope of line from src to dst */
+var edgePO = {
+  eq:         function eq(e1, e2)    { return F.isZero(V.cross(V.minus(e1.dst.pos, e1.src.pos),
+							       V.minus(e2.dst.pos, e2.src.pos))); },
+  arbitrary:  arbEdge,
+  isInstance: function isInstance(e) { return vertPO.isInstance(e.dst) && vertPO.isInstance(e.src); },
+  ofString:   function ofString(s)   { return {dst: V.ofString(s.substring(2)), leftIn: s[0] == 'I', rightIn: s[1] == 'I'}; },
+  stringOf:   function stringOf(e)   { return (e.leftIn  ? 'I' : 'O')
+					    + (e.rightIn ? 'I' : 'O')
+					    + V.stringOf(e.dst); },
+  leq:        function leq(e1, e2)   { return F.leq(V.cross(V.minus(e1.dst.pos,e1.src.pos),
+							    V.minus(e2.dst.pos,e2.src.pos), F.zero); }
+};
+
+/******************************************************************************/
+
 /** update v.incoming and e.src for all vertices and edges of r */
 function addBackEdges(r) {
   for (var i in r) {
@@ -93,7 +122,9 @@ function addBackEdges(r) {
     r[i].incoming.sort(edgePO);
 };
 
-/** example ********************************************************************
+/** examples ******************************************************************/
+
+/* example 1
 **
 **         _e
 **       _╱ ╱
@@ -130,7 +161,7 @@ R.example1 = function example1() {
   return result;
 };
 
-/** example ********************************************************************
+/* example 2
 **
 ** a──────────c
 ** │          │
@@ -168,32 +199,7 @@ R.example2 = function() {
   return result;
 };
 
-/** Comparators ***************************************************************/
-
-/** compare vertices lexicographically by position */
-var vertPO = {
-  eq:         function eq(v1, v2)    { return V.eq(v1.pos, v2.pos); },
-  arbitrary:  arbVert,
-  isInstance: function isInstance(v) { return V.isInstance(v.pos); },
-  ofString:   function ofString(s)   { return V.ofString(s); },
-  stringOf:   function stringOf(v)   { return V.stringOf(v); },
-  leq:        function leq(v1, v2)   { return V.lt(v1.x, v2.x)
-                                           || V.eq(v1.x, v2.x) && V.leq(v1.y, v2.y); }
-};
-
-/** compare edges by slope of line from src to dst */
-var edgePO = {
-  eq:         function eq(e1, e2)    { return F.isZero(V.cross(V.minus(e1.dst.pos, e1.src.pos),
-                                                               V.minus(e2.dst.pos, e2.src.pos))); },
-  arbitrary:  arbEdge,
-  isInstance: function isInstance(e) { return vertPO.isInstance(e.dst) && vertPO.isInstance(e.src); },
-  ofString:   function ofString(s)   { return {dst: V.ofString(s.substring(2)), leftIn: s[0] == 'I', rightIn: s[1] == 'I'}; },
-  stringOf:   function stringOf(e)   { return (e.leftIn  ? 'I' : 'O')
-                                            + (e.rightIn ? 'I' : 'O')
-                                            + V.stringOf(e.dst); },
-  leq:        function leq(e1, e2)   { return F.leq(V.cross(V.minus(e1.dst.pos,e1.src.pos),
-                                                            V.minus(e2.dst.pos,e2.src.pos), F.zero); }
-};
+/** constructors **************************************************************/
 
 /** create a region representing a simple polygon, given as a list of points in
  *  clockwise order around the boundary.
@@ -218,6 +224,8 @@ R.ofPoly = function ofPoly(points) {
 
   return result;
 };
+
+/** utility functions *********************************************************/
 
 R.ofString = function ofString(s) {
   // TODO: handle cycles
@@ -265,11 +273,6 @@ R.regularize = function regularize(r) {
   return r.filter(function (v) { return v.incoming.length > 0 || v.outgoing.length > 0; });
 };
 
-/** a copy of r with adjacent colinear edges merged */
-R.merge = function merge(r) {
-  throw new Error("not implemented");
-};
-
 /** a copy of r with all vertices translated by offset */
 R.translate = function translate(r, offset) {
   var result = R.copy(r);
@@ -279,6 +282,22 @@ R.translate = function translate(r, offset) {
 
   return result;
 };
+
+/** merge *********************************************************************/
+
+/** a copy of r with adjacent colinear edges merged */
+R.merge = function merge(r) {
+  throw new Error("not implemented");
+};
+
+/** union *********************************************************************/
+
+/** union the two regions */
+R.union = function union(r1, r2) {
+  throw new Error("Not Implemented");
+};
+
+/******************************************************************************/
 
 return R;
 
