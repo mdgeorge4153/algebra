@@ -40,12 +40,19 @@ Notation "( + )"    := plus_op (only parsing) : mc_scope.
 Notation "( x + )"  := (plus_op x) (only parsing) : mc_scope.
 Notation "( + x )"  := (λ y,y + x) (only parsing) : mc_scope.
 
+Class TimesOp A B C := times_op : A -> B -> C.
+Infix "*"        := times_op : mc_scope.
+Notation "( * )" := times_op (only parsing) : mc_scope.
+Notation "( x * )" := (times_op x) (only parsing) : mc_scope.
+Notation "( * x )" := (λ y, y * x) (only parsing) : mc_scope.
+
 (* Instances *)
 
 Instance plus_is_sg_op `{f : PlusOp A} : SemiGroupOp A := f.
 Instance zero_is_unit  `{e : ZeroOp A} : UnitOp A      := e.
 Instance one_is_unit   `{e : OneOp  A} : UnitOp A      := e.
 Instance neg_is_inv_op `{n : NegOp  A} : InverseOp A   := n.
+Instance times_is_sg_op `{f : TimesOp A A A} : SemiGroupOp A := f.
 
 (* General properties *)
 
@@ -88,6 +95,9 @@ Class Inverse (op : A -> A -> A) (inv : A -> A) (unit : A) :=
     ; inv_is_right_inverse : RightInverse op inv unit
     }.
 
+Class DistributesOver (f : A -> A -> A) (g : A -> A -> A) : Prop :=
+    distributivity : forall (x y z: A), f x (g y z) = g (f x y) (f x z).
+
 End Properties.
 
 (* Algebraic hierarchy *)
@@ -108,13 +118,19 @@ Class SemiGroup : Prop :=
     ; sg_op_proper : Proper ((=) ==> (=) ==> (=)) (&)
     }.
 
-Context {Au : UnitOp A} {Ainv : InverseOp A}.
+Context {Au : UnitOp A}.
+
+Class Monoid : Prop :=
+    { mon_semigroup :> SemiGroup
+    ; mon_identity  :> Identity (&) unit
+    }.
+
+Context {Ainv : InverseOp A}.
 
 Class Group : Prop :=
-    { g_semigroup   :> SemiGroup
-    ; g_identity    :> Identity (&) unit
-    ; g_inverse     :> Inverse  (&) (⁻¹) unit
-    ; inv_proper    :> Proper ((=) ==> (=)) (⁻¹)
+    { gp_monoid  :> SemiGroup
+    ; g_inverse  :> Inverse  (&) (⁻¹) unit
+    ; inv_proper :> Proper ((=) ==> (=)) (⁻¹)
     }.
 
 End Groups.
@@ -128,7 +144,41 @@ Class AbGroup : Prop :=
     ; ab_commutative :> Commutative (+)
     }.
 
+Context {Atimes : TimesOp A A A} {Aone : OneOp A}.
+
+Class Ring : Prop :=
+    { r_abelian_group         :> AbGroup
+    ; r_multiplicative_monoid :> @Monoid times_is_sg_op one_is_unit
+    ; r_distributive          :> DistributesOver ( * ) (+)
+    }.
+
+Class CommRing : Prop :=
+    { cr_ring :> Ring
+    ; cr_commutative :> Commutative ( * )
+    }.
+
+Definition is_unit (x : A) : Prop := exists (y : A), x * y = 1.
+
+Definition is_zero_divisor (x : A) : Prop :=
+  ~ (x = 0) /\ exists (y : A), x * y = 0.
+
+Class IntegralDomain : Prop :=
+    { dom_ring :> CommRing
+    ; dom_no_zero_divisors : forall (x : A), ~ (is_zero_divisor x)
+    }.
+
+Class Field : Prop :=
+    { field_ring :> CommRing
+    ; field_all_units : forall (x : A), is_unit x \/ x = 0
+    }.
+
 End Rings.
+
+Section Modules.
+
+Context S {SEq : Equiv S} .
+
+End Modules.
 
 End Algebra.
 
@@ -137,11 +187,9 @@ Instance plus_sgop : SemiGroupOp nat := Peano.plus.
 
 Instance nat_plus_assoc : Associative Peano.plus := Nat.add_assoc.
 
-Set Printing Implicit.
-Check SemiGroup.
-
 Instance sg_nat : SemiGroup nat.
 Proof.
     repeat split; try apply _.
 Qed.
+
 
