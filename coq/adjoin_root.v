@@ -1,3 +1,5 @@
+(* This is an implementation of numbers of the form a + sqrt(n) as a ring and field for mathclasses *)
+
 Require Import 
   Coq.setoid_ring.Ring Coq.setoid_ring.Field
   MathClasses.interfaces.abstract_algebra 
