@@ -1,9 +1,8 @@
-(* This is an implementation of numbers of the form a + sqrt(n) as a ring and field for mathclasses *)
-
-Require Import 
+Require Import
   Coq.setoid_ring.Ring Coq.setoid_ring.Field
   MathClasses.interfaces.abstract_algebra 
-  MathClasses.theory.rings MathClasses.theory.dec_fields.
+  MathClasses.theory.rings MathClasses.theory.dec_fields
+  MathClasses.interfaces.orders MathClasses.orders.semirings MathClasses.orders.rings.
 
 Inductive AdjoinRoot R (n : R) : Type := adjoin
   { ones  : R
@@ -21,17 +20,6 @@ Context `{Ring R} `{n : R}.
 
 Global Instance Adjoin_equiv : Equiv (AdjoinRoot R n) :=
   λ (x : AdjoinRoot R n) (y : AdjoinRoot R n), ones x = ones y /\ roots x = roots y.
-
-(*
-Require Import Coq.Bool.Sumbool.
-Instance and_dec `{Decision P} `{Decision Q} : Decision (P /\ Q).
-refine (
-  if (decide P)
-  then
-    if (decide Q) then left _ _ else right _ _
-  else right _ _); tauto.
-Defined.
-*)
 
 Global Instance Adjoin_plus  : Plus (AdjoinRoot R n) :=
   λ x y,adjoin (ones x + ones y) (roots x + roots y).
@@ -61,36 +49,41 @@ Proof.
 repeat (split; try apply _); unfolds; ring_on_ring; repeat (apply sg_op_proper); firstorder.
 Qed.
 
+Definition from_r (r : R) : AdjoinRoot R n :=
+  adjoin r zero.
+
+Global Instance: SemiRing_Morphism from_r.
+Proof.
+repeat (split; try apply _); simpl; try ring_simplify; firstorder.
+Qed.
+
+Global Instance: Injective from_r.
+Proof.  firstorder. Qed.
+
+Global Instance roots_mor : @SemiGroup_Morphism _ _ _ _ (+) (+) (@roots R n).
+Proof. repeat (split; try apply _); firstorder. Qed.
+
+Global Instance ones_mor : @SemiGroup_Morphism _ _ _ _ (+) (+) (@ones R n).
+Proof. repeat (split; try apply _); firstorder. Qed.
+
 End ring.
 
 (******************************************************************************)
-Section field.
+Section decfield.
 
 Context `{DecField F} `{n : F} {n_nonsquare : ∀ k, k * k ≠ n}.
+Add Field F : (stdlib_field_theory F).
 
-Instance Adjoin_apart: Apart (AdjoinRoot F n) := (≠).
+Global Instance Adjoin_apart: Apart (AdjoinRoot F n) := (≠).
 Instance: TrivialApart (AdjoinRoot F n).
 Proof. firstorder. Qed.
 
-Instance Adjoin_recip: DecRecip (AdjoinRoot F n) :=
+Global Instance Adjoin_recip: DecRecip (AdjoinRoot F n) :=
   λ (x : AdjoinRoot F n), 
     let den := x.(ones) * x.(ones) - x.(roots) * x.(roots) * n in
     adjoin (x.(ones) / den) (-x.(roots) / den).
 
-Add Field F : (stdlib_field_theory F).
-
-Instance roots_mor : Setoid_Morphism (@roots F n).
-Proof. split; try (apply _); repeat red; intros; firstorder. Qed.
-
-Instance ones_mor : Setoid_Morphism (@ones F n).
-Proof. split; try (apply _); repeat red; intros; firstorder. Qed.
-
 Ltac unfolds := unfold equiv, Adjoin_negate, Adjoin_plus, Adjoin_mult, dec_recip, Adjoin_recip in *; simpl in *.
-
-(*
-Lemma inv_unique: forall (x y : F), x - y = 0 -> x = y.
-Proof. 
-*)
 
 Context `{∀ (x y : F), Decision (x = y)}.
 
@@ -110,7 +103,7 @@ end.
 
 Qed.
 
-Instance: DecField (AdjoinRoot F n).
+Global Instance: DecField (AdjoinRoot F n).
 Proof.
 repeat (split; try apply _);
   match goal with
@@ -121,4 +114,65 @@ repeat (split; try apply _);
     | [ |- _ ] => try ring
   end.
 Qed.
+
+End decfield.
+
+(******************************************************************************)
+Section orders.
+
+Context `{Ring OR} `{!SemiRingOrder Rle} `{n : OR} `{n_nonneg : 0 ≤ n}.
+
+Add Ring OR : (stdlib_ring_theory OR).
+Add Ring AR : (stdlib_ring_theory (AdjoinRoot OR n)).
+
+Definition nonneg (x : AdjoinRoot OR n) : Prop :=
+  (*
+    a + b√n ≥ 0 iff a ≥ -b√n
+     - if a is zero, this is same as b ≥ 0
+     - if a pos, we can multiply both sides by 
+  *)
+  let a := ones x in
+  let b := roots x in
+  (0 ≤ a /\ 0 ≤ b)
+  \/
+  (0 ≤ a /\ b * b ≤ n * a * a)
+  \/
+  (0 ≤ b /\ n * a * a ≤ b * b).
+
+Global Instance Adjoin_le : Le (AdjoinRoot OR n) :=
+  λ x y,nonneg (y - x).
+
+Ltac unfolds := unfold le, Adjoin_le, nonneg, Adjoin_negate, Adjoin_plus, Adjoin_mult, dec_recip, Adjoin_recip in *; simpl in *.
+
+Instance: Proper ((=) ==> (=) ==> iff) Adjoin_le.
+Proof.
+repeat red; intros; unfolds; rewrite <- H0; rewrite <- H1; auto.
+Qed.
+
+Instance: Reflexive Adjoin_le.
+Proof.
+repeat red; intro x; left; split; ring_simplify (x - x); firstorder.
+Qed.
+
+Instance: Transitive Adjoin_le.
+Proof.
+repeat red.
+
+Instance: AntiSymmetric Adjoin_le.
+
+Instance: SemiRingOrder Adjoin_le.
+Proof.
+split.
+  split; auto. apply _. apply _. split. apply _.
+repeat split
+
+End.
+
+(******************************************************************************)
+Notation "( a √ 1 + b √ n )" := (@adjoin _ n a b) : mc_scope.
+
+Require Import MathClasses.implementations.peano_naturals.
+Eval compute in (adjoin 4 3) * (adjoin 0 1) %nat : AdjoinRoot nat 2.
+Eval compute in (4√1 + 3√2) * (6√1 + 2√2) %nat .
+Eval compute in / (4√1 + 3√2) %nat.
 
