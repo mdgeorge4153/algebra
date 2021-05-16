@@ -131,20 +131,23 @@ Definition nonneg (x : AdjoinRoot OR n) : Prop :=
      - if a is zero, this is same as b ≥ 0
      - if a pos, we can multiply both sides by 
   *)
-  let a := ones x in
-  let b := roots x in
-  (zero ≤ a /\ b * b ≤ n * a * a)
+  let x1 := ones  x in
+  let xn := roots x in
+  (zero ≤ x1 /\ n * xn * xn ≤ x1 * x1)
   \/
-  (zero ≤ b /\ n * a * a ≤ b * b).
+  (zero ≤ xn /\ x1 * x1 ≤ n * xn * xn).
 
 Global Instance Adjoin_le : Le (AdjoinRoot OR n) :=
   λ x y,nonneg (y - x).
 
 Ltac unfolds := unfold le, Adjoin_le, nonneg, Adjoin_negate, Adjoin_plus, Adjoin_mult, dec_recip, Adjoin_recip in *; simpl in *.
 
+Instance: Proper ((=) ==> iff) nonneg.
+Proof.  repeat red. intros x y x_eq_y. split; unfolds; rewrite <- x_eq_y; auto. Qed.
+
 Instance: Proper ((=) ==> (=) ==> iff) Adjoin_le.
 Proof.
-repeat red; intros; unfolds; rewrite <- H0; rewrite <- H1; auto.
+repeat red; intros x y x_eq_y z w z_eq_w; unfolds; rewrite <- x_eq_y; rewrite <- z_eq_w; auto.
 Qed.
 
 Instance: Reflexive Adjoin_le.
@@ -180,17 +183,17 @@ Context `{!ZeroProduct OR}.
 
 (* TODO: this is absolutely terrible *)
 Lemma eq_sqrt: forall (a b: OR), 0 ≤ a -> 0 ≤ b -> a * a = b * b -> a = b.
-Proof. intros.
-assert ((a + b) * (a - b) = 0).
-  ring_simplify. rewrite H2. ring_simplify. auto.
-assert ((a + b) = 0 \/ (a - b) = 0).
+Proof. intros a b a_nonneg b_nonneg asq_eq_bsq.
+assert ((a + b) * (a - b) = 0) as prod_zero.
+  ring_simplify. rewrite asq_eq_bsq. ring_simplify. auto.
+assert ((a + b) = 0 \/ (a - b) = 0) as one_factor_zero.
   apply zero_product. auto.
-destruct H4.
-  assert (b = 0).
-    apply (antisymmetry (≤)); auto. rewrite <- H4. setoid_replace b with (0 + b) at 1 by ring.  apply ineq_sum; auto.
-  rewrite H5 in H4. ring_simplify in H4. rewrite H4. auto.
+destruct one_factor_zero as [sum_zero | diff_zero].
+  assert (b = 0) as b_zero.
+    apply (antisymmetry (≤)); auto. rewrite <- sum_zero. setoid_replace b with (0 + b) at 1 by ring.  apply ineq_sum; auto.
+  rewrite b_zero in sum_zero. ring_simplify in sum_zero. rewrite b_zero. auto.
 
-  setoid_replace b with (b + 0) by ring. rewrite <- H4. ring.
+  setoid_replace b with (b + 0) by ring. rewrite <- diff_zero. ring.
 Qed.
 
 Lemma ineq_sqrt: forall (a b: OR), 0 ≤ b -> a * a ≤ b * b -> a ≤ b.
@@ -212,6 +215,15 @@ end;
 apply nonneg_mult_compat; auto.
 Qed.
 
+Lemma nonneg_both_nonneg: forall a, 0 ≤ ones a -> 0 ≤ roots a -> nonneg a.
+Proof.
+intros; destruct (total (≤) (n * roots a * roots a) (ones a * ones a));
+  red; intuition.
+Qed.
+
+Lemma neg_both_neg: forall a, nonneg a -> 0 ≤ ones a \/ 0 ≤ roots a.
+Proof. unfold nonneg;  intuition. Qed.
+
 Lemma nonneg_sum: forall x y, nonneg x -> nonneg y -> nonneg (x + y).
 (* paper proof:
  - case 1: 0 ≤ ax and bx * bx ≤ n * ax * ax, and 0 ≤ ay and by ≤ n * ay * ay
@@ -232,6 +244,7 @@ x + y = ax + ay + (bx + by)√n.
 
 
 *)
+
 repeat red. unfold nonneg. intros a b nonneg_a nonneg_b. destruct nonneg_a; destruct nonneg_b.
 (* case 1/4 *)
 simpl. simpl. left. split.
@@ -242,30 +255,60 @@ repeat match goal with
   | [ |- 0 ≤ ?x * ?y ] => apply nonneg_mult_compat; red
   | [ |- 0 ≤ Aplus Aone Aone ] => apply le_0_2
 end; firstorder.
-setoid_replace (2 * roots a * roots b * (2 * roots a * roots b)) with     (4 * (roots a * roots a) * (roots b * roots b)) by ring.
-setoid_replace (2 * n * ones a * ones b * (2 * n * ones a * ones b)) with (4 * (n * ones a  * ones a)  * (n * ones b * ones b)) by ring.
+setoid_replace (2 * n * roots a * roots b * (2 * n * roots a * roots b)) with (4 * (n * (roots a * roots a)) * (n * (roots b * roots b))) by ring.
+setoid_replace (2 * ones a * ones b * (2 * ones a * ones b))             with (4 * (ones a  * ones a)  * (ones b * ones b)) by ring.
   apply ineq_prod.
     split.
       apply nonneg_mult_compat.
         apply le_0_4.
+        apply nonneg_mult_compat.
+        auto.
         apply (nonneg_square _).
       apply ineq_prod.
         split.
           apply le_0_4.
           reflexivity.
         split.
+          apply nonneg_mult_compat.
+          auto.
           apply (nonneg_square _).
-          intuition.
-      split.
-        apply (nonneg_square _).
-        destruct H1.
         intuition.
-    intuition.
+      ring_simplify. auto.
+      split.
+        apply nonneg_mult_compat.
+        auto.
+        apply (nonneg_square _).
+        ring_simplify. auto.
+      intuition.
+      intuition.
 
+(* case 2: *)
+destruct (total (≤) 0 (ones a + ones b)).
+  (* case 2a *)
+  left. split.
+    simpl. auto.
+    
+
+  (* case 2b *)
+*)
+
+Lemma order_preserve_plus: forall x y z, x ≤ y -> z + x ≤ z + y.
+Proof.
+intros; unfold le, Adjoin_le;
+  setoid_replace (z + y - (z + x)) with (y - x) by ring;
+  firstorder.
+Qed.
+
+Lemma ineq_sum: forall x y z w, x ≤ y -> z ≤ w -> x + z ≤ y + w.
+Proof.
+intros. transitivity (x + w).
 
 Instance: Transitive Adjoin_le.
 Proof.
-repeat red.
+red. unfold Adjoin_le. intros. replace (z - x) with (
+
+Instance: ∀ z : AdjoinRoot OR n, OrderPreserving (z +).
+Proof. repeat (split; try apply _).
 
 Instance: AntiSymmetric Adjoin_le.
 
